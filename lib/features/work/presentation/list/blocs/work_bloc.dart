@@ -2,8 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:je_fisc/config/di/injector.dart';
 import 'package:je_fisc/core/security/biometric_service.dart';
 
-import '../../../../core/utils/app_status.dart';
-import '../../domain/repositories/work_repository.dart';
+import '../../../../../core/utils/app_status.dart';
+import '../../../domain/repositories/work_repository.dart';
 import 'work_event.dart';
 import 'work_state.dart';
 

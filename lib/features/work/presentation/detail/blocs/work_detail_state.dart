@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../../core/utils/app_status.dart';
+import '../../../../../core/utils/app_status.dart';
 
-/// Everything the Work screen draws from, in one place.
+/// Everything the WorkDetail screen draws from, in one place.
 ///
 /// A status field rather than a sealed state per phase: `_body` in the view is
 /// handed this same class whatever the status is, so a field added here is
@@ -11,8 +11,9 @@ import '../../../../core/utils/app_status.dart';
 /// there is nothing to re-declare. The status itself is [AppStatus], shared by
 /// every screen, which is what lets `AppStatusView` draw it — and being a
 /// [StatusState] is what lets the bloc's `runAction` handle its errors.
-class WorkState extends Equatable implements StatusState<WorkState> {
-  const WorkState({
+class WorkDetailState extends Equatable
+    implements StatusState<WorkDetailState> {
+  const WorkDetailState({
     this.status = AppStatus.initial,
     this.errorMessage,
     this.successMessage,
@@ -25,7 +26,7 @@ class WorkState extends Equatable implements StatusState<WorkState> {
   /// traces to a blank screen. `BoneMock.name` / `BoneMock.words(3)`
   /// (skeletonizer) hand out strings whose length becomes the width of the
   /// bone.
-  static const placeholder = WorkState(status: AppStatus.success);
+  static const placeholder = WorkDetailState(status: AppStatus.success);
 
   @override
   final AppStatus status;
@@ -43,16 +44,16 @@ class WorkState extends Equatable implements StatusState<WorkState> {
   final String? successMessage;
 
   // TODO: add what the screen shows, e.g.
-  // `final List<WorkModel> items;`. A field has to reach four places: the
+  // `final List<WorkDetailModel> items;`. A field has to reach four places: the
   // constructor, `copyWith`, `props` — without which two states compare equal
   // and the second emit is dropped — and `placeholder`.
 
-  WorkState copyWith({
+  WorkDetailState copyWith({
     AppStatus? status,
     String? errorMessage,
     String? successMessage,
   }) {
-    return WorkState(
+    return WorkDetailState(
       status: status ?? this.status,
       // Not `?? this.errorMessage`: see the two fields above. A message not
       // passed here is a message already shown.
@@ -62,7 +63,7 @@ class WorkState extends Equatable implements StatusState<WorkState> {
   }
 
   @override
-  WorkState withStatus(AppStatus status, {String? errorMessage}) =>
+  WorkDetailState withStatus(AppStatus status, {String? errorMessage}) =>
       copyWith(status: status, errorMessage: errorMessage);
 
   @override

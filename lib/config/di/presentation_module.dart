@@ -1,6 +1,8 @@
-import 'injector.dart';
 import '../../features/work/domain/repositories/work_repository.dart';
-import '../../features/work/presentation/blocs/work_bloc.dart';
+import '../../features/work/presentation/create/blocs/work_create_bloc.dart';
+import '../../features/work/presentation/detail/blocs/work_detail_bloc.dart';
+import '../../features/work/presentation/list/blocs/work_bloc.dart';
+import 'injector.dart';
 
 /// The state holders.
 ///
@@ -12,8 +14,20 @@ void registerBlocs() {
   // ── Work ────────────────────────────────────────────────────
   // A factory, not a singleton: the screen's BlocProvider creates it and
   // closing the route closes it.
-  getIt.registerFactory<WorkBloc>(
-    () => WorkBloc(getIt<WorkRepository>()),
+  getIt.registerFactory<WorkBloc>(() => WorkBloc(getIt<WorkRepository>()));
+
+  // ── WorkDetails ─────────────────────────────────────────────
+  // A factory, not a singleton: the screen's BlocProvider creates it and
+  // closing the route closes it.
+  getIt.registerFactory<WorkDetailBloc>(
+    () => WorkDetailBloc(getIt<WorkRepository>()),
+  );
+
+  // ── WorkCreate ──────────────────────────────────────────────
+  // A factory, not a singleton: the screen's BlocProvider creates it and
+  // closing the route closes it.
+  getIt.registerFactory<WorkCreateBloc>(
+    () => WorkCreateBloc(getIt<WorkRepository>()),
   );
 
   // moarch:registrations — `moarch create feature` and

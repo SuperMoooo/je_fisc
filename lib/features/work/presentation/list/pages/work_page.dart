@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../config/di/injector.dart';
+import '../../../../../config/di/injector.dart';
 import '../blocs/work_bloc.dart';
 import '../blocs/work_event.dart';
 import '../views/work_view.dart';

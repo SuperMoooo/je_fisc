@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/work/presentation/pages/work_page.dart';
+import '../../features/work/presentation/list/pages/work_page.dart';
 import './app_routes.dart';
 
 /// Navigate without a BuildContext: `appRouter.go(...)`.

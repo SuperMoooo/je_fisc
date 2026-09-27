@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../../shared/widgets/app_status_view.dart';
-import '../../../../shared/widgets/overlays/app_toast.dart';
+import '../../../../../shared/widgets/app_status_view.dart';
+import '../../../../../shared/widgets/overlays/app_toast.dart';
 import '../blocs/work_bloc.dart';
 import '../blocs/work_event.dart';
 import '../blocs/work_state.dart';
