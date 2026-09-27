@@ -9,6 +9,7 @@ abstract final class AppRoutes {
 
   // `moarch create feature` adds each feature's path above the next line —
   // keep it.
+  static const work = '/work';
   // moarch:routes
 
   // Dynamic routes: the constant holds the pattern GoRouter matches on, the

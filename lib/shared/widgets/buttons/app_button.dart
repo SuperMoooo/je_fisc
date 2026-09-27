@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../config/di/injector.dart';
-import '../../../core/security/biometric_service.dart';
 
+import '../../../config/di/injector.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/security/biometric_service.dart';
 import '../../../core/utils/extensions.dart';
 
 /// Color role of [AppButton] — what the button is *about*, never how it is
@@ -89,46 +89,46 @@ class AppButton extends StatelessWidget {
   final bool requireAuth;
 
   _ButtonSizeConfig _getSizeConfig() => switch (size) {
-        AppButtonSize.small => (
-            height: AppConstants.touchTarget,
-            fontSize: 14,
-            iconSize: 18,
-            padding: AppConstants.padding12,
-          ),
-        AppButtonSize.medium => (
-            height: AppConstants.touchTarget + 4,
-            fontSize: 16,
-            iconSize: 22,
-            padding: AppConstants.padding16,
-          ),
-        AppButtonSize.large => (
-            height: AppConstants.touchTarget + 8,
-            fontSize: 18,
-            iconSize: 26,
-            padding: AppConstants.padding16,
-          ),
-      };
+    AppButtonSize.small => (
+      height: AppConstants.touchTarget,
+      fontSize: 14,
+      iconSize: 18,
+      padding: AppConstants.padding12,
+    ),
+    AppButtonSize.medium => (
+      height: AppConstants.touchTarget + 4,
+      fontSize: 16,
+      iconSize: 22,
+      padding: AppConstants.padding16,
+    ),
+    AppButtonSize.large => (
+      height: AppConstants.touchTarget + 8,
+      fontSize: 18,
+      iconSize: 26,
+      padding: AppConstants.padding16,
+    ),
+  };
 
   /// The variant's color, plus the color that reads on top of it. Single
   /// source for every color the button paints.
   (Color, Color) _colorsOf(ThemeData theme) => switch (variant) {
-        AppButtonVariant.primary => (
-            theme.colorScheme.primary,
-            theme.colorScheme.onPrimary,
-          ),
-        AppButtonVariant.secondary => (
-            theme.colorScheme.secondary,
-            theme.colorScheme.onSecondary,
-          ),
-        AppButtonVariant.tertiary => (
-            theme.colorScheme.tertiary,
-            theme.colorScheme.onTertiary,
-          ),
-        AppButtonVariant.danger => (
-            theme.colorScheme.error,
-            theme.colorScheme.onError,
-          ),
-      };
+    AppButtonVariant.primary => (
+      theme.colorScheme.primary,
+      theme.colorScheme.onPrimary,
+    ),
+    AppButtonVariant.secondary => (
+      theme.colorScheme.secondary,
+      theme.colorScheme.onSecondary,
+    ),
+    AppButtonVariant.tertiary => (
+      theme.colorScheme.tertiary,
+      theme.colorScheme.onTertiary,
+    ),
+    AppButtonVariant.danger => (
+      theme.colorScheme.error,
+      theme.colorScheme.onError,
+    ),
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -139,23 +139,21 @@ class AppButton extends StatelessWidget {
     // Variant chooses the color; type only decides how that color is applied.
     final (backgroundColor, foregroundColor) = switch (type) {
       AppButtonType.filled => (accent, onAccent),
-      AppButtonType.outlined || AppButtonType.ghost => (
-          Colors.transparent,
-          accent,
-        ),
+      AppButtonType.outlined ||
+      AppButtonType.ghost => (Colors.transparent, accent),
     };
 
     // Faded versions of the same colors for the disabled state, so a disabled
     // button still reads as its variant rather than a generic grey.
     final (disabledBackground, disabledForeground) = switch (type) {
       AppButtonType.filled => (
-          accent.withValues(alpha: 0.35),
-          onAccent.withValues(alpha: 0.9),
-        ),
+        accent.withValues(alpha: 0.35),
+        onAccent.withValues(alpha: 0.9),
+      ),
       AppButtonType.outlined || AppButtonType.ghost => (
-          Colors.transparent,
-          accent.withValues(alpha: 0.4),
-        ),
+        Colors.transparent,
+        accent.withValues(alpha: 0.4),
+      ),
     };
 
     // Busy is not the same as unavailable: a loading button keeps its full
@@ -177,7 +175,7 @@ class AppButton extends StatelessWidget {
                   return;
                 }
                 final verified = await getIt<BiometricService>()
-                    .verifyUserLocalAuth(context);
+                    .verifyUserLocalAuth();
                 if (verified) onPressed!();
               },
         style: ElevatedButton.styleFrom(
@@ -185,10 +183,12 @@ class AppButton extends StatelessWidget {
           padding: sizeConfig.padding,
           backgroundColor: backgroundColor,
           foregroundColor: foregroundColor,
-          disabledBackgroundColor:
-              showsBusy ? backgroundColor : disabledBackground,
-          disabledForegroundColor:
-              showsBusy ? foregroundColor : disabledForeground,
+          disabledBackgroundColor: showsBusy
+              ? backgroundColor
+              : disabledBackground,
+          disabledForegroundColor: showsBusy
+              ? foregroundColor
+              : disabledForeground,
           shape: RoundedRectangleBorder(
             borderRadius: switch (shape) {
               AppButtonShape.rounded => AppConstants.borderRadius12,
@@ -216,8 +216,11 @@ class AppButton extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (prefixIcon != null) ...[
-                    Icon(prefixIcon,
-                        size: sizeConfig.iconSize, color: foregroundColor),
+                    Icon(
+                      prefixIcon,
+                      size: sizeConfig.iconSize,
+                      color: foregroundColor,
+                    ),
                     const SizedBox(width: AppConstants.space4),
                   ],
                   // Flexible + ellipsis so a label longer than an explicit
@@ -236,8 +239,11 @@ class AppButton extends StatelessWidget {
                   ),
                   if (suffixIcon != null) ...[
                     const SizedBox(width: AppConstants.space4),
-                    Icon(suffixIcon,
-                        size: sizeConfig.iconSize, color: foregroundColor),
+                    Icon(
+                      suffixIcon,
+                      size: sizeConfig.iconSize,
+                      color: foregroundColor,
+                    ),
                   ],
                 ],
               ),
