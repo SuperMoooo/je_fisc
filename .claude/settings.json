@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "allow": [
+      "Bash(fvm flutter pub get)",
+      "Bash(fvm flutter analyze *)",
+      "Bash(fvm flutter test *)",
+      "Bash(fvm dart format *)",
+      "Bash(fvm dart run build_runner build *)",
+      "Bash(bloc lint *)",
+      "Bash(moarch create widget --list)",
+      "Bash(moarch update --list)",
+      "Bash(moarch doctor)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Edit(**/*.g.dart)",
+      "Edit(**/*.freezed.dart)",
+      "Edit(./.moarch.yaml)"
+    ]
+  }
+}

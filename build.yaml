@@ -1,0 +1,21 @@
+targets:
+    $default:
+        builders:
+            json_serializable:
+                options:
+                    # Makes `toJson()` call `toJson()` on a nested model,
+                    # rather than leaving the model object in the map. Off by
+                    # default in json_serializable, and the failure only shows
+                    # up once something other than `jsonEncode` reads the map.
+                    explicit_to_json: true
+                    # The case every JSON key is written in. A field without
+                    # an explicit `@JsonKey(name:)` is read and written in
+                    # it. Set it to whatever your API uses:
+                    #   none            createdAt   (the field name as is)
+                    #   snake           created_at
+                    #   kebab           created-at
+                    #   pascal          CreatedAt
+                    #   screamingSnake  CREATED_AT
+                    # Changing it changes the key of every field, so run
+                    # build_runner afterwards and check your models.
+                    field_rename: snake

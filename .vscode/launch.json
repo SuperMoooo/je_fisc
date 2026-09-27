@@ -1,0 +1,78 @@
+{
+    // The flavored entries are ready for flavors, not proof the project has
+    // them: until the native side declares a matching flavor they fail with
+    // "The Xcode project does not define custom schemes" / "Could not find
+    // product flavor". Declare them in android/app/build.gradle.kts
+    // (productFlavors) and as an Xcode scheme + build configuration.
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "debug",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug"
+        },
+        {
+            // Where you measure jank — never in debug.
+            "name": "profile",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "release",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "dev (debug)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "args": ["--flavor", "dev"]
+        },
+        {
+            "name": "dev (release)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "args": ["--flavor", "dev"]
+        },
+        {
+            "name": "staging (debug)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "args": ["--flavor", "staging"]
+        },
+        {
+            "name": "staging (release)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "args": ["--flavor", "staging"]
+        },
+        {
+            "name": "prod (debug)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug",
+            "args": ["--flavor", "prod"]
+        },
+        {
+            "name": "prod (profile)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": ["--flavor", "prod"]
+        },
+        {
+            "name": "prod (release)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "args": ["--flavor", "prod"]
+        }
+    ]
+}

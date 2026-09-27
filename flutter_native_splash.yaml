@@ -1,0 +1,9 @@
+# dart run flutter_native_splash:create --path=flutter_native_splash.yaml
+# No icon set — it falls back to the app icon in each platform folder.
+flutter_native_splash:
+    color: '#f9f9f9' # BG COLOR (light mode)
+    color_dark: '#f9f9f9' # BG COLOR (dark mode)
+
+    android_12:
+        color: '#f9f9f9' # BG COLOR (light mode)
+        color_dark: '#f9f9f9' # BG COLOR (dark mode)

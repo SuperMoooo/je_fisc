@@ -1,0 +1,88 @@
+
+# Secret
+# ANDROID_KEYSTORE_BASE64   - base64 of your .jks keystore
+# KEYSTORE_STORE_PASSWORD   - the keystore's store password
+# KEYSTORE_KEY_PASSWORD     - the key's password
+# KEYSTORE_KEY_ALIAS        - the key alias, e.g. my-key-alias
+#
+
+name: Build ANDROID APK
+
+on:
+    workflow_dispatch: {}
+
+jobs:
+    # ── 1. Check for the signing keystore ───────────────────────────────────────
+    # Determines whether the keystore secrets are present so the build job can
+    # skip cleanly instead of failing when they're not configured.
+    check-android-secrets:
+        runs-on: ubuntu-latest
+        outputs:
+            has_secrets: ${{ steps.check.outputs.has_secrets }}
+        steps:
+            - name: Check required secrets
+              id: check
+              env:
+                  KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+                  STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+                  KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+                  KEY_ALIAS: ${{ secrets.KEYSTORE_KEY_ALIAS }}
+              run: |
+                  if [ -n "$KEYSTORE_BASE64" ] && [ -n "$STORE_PASSWORD" ] && \
+                     [ -n "$KEY_PASSWORD" ] && [ -n "$KEY_ALIAS" ]; then
+                    echo "has_secrets=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "has_secrets=false" >> "$GITHUB_OUTPUT"
+                    echo "⚠️ Android signing secrets not fully configured — Android build will be skipped."
+                  fi
+
+    # ── 2. Build Android ─────────────────────────────────────────────────────────
+    # Only runs if every keystore secret exists.
+    build-android:
+        runs-on: ubuntu-latest
+        needs: [check-android-secrets]
+        if: needs.check-android-secrets.outputs.has_secrets == 'true'
+
+        env:
+            GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx2048m -Dorg.gradle.daemon=false"
+
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Decode Keystore
+              run: |
+                  echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/app/release-key.jks
+
+            - name: Create key.properties
+              run: |
+                  cat <<EOF > android/key.properties
+                  storePassword=${{ secrets.KEYSTORE_STORE_PASSWORD }}
+                  keyPassword=${{ secrets.KEYSTORE_KEY_PASSWORD }}
+                  keyAlias=${{ secrets.KEYSTORE_KEY_ALIAS }}
+                  storeFile=release-key.jks
+                  EOF
+
+            - uses: subosito/flutter-action@v2
+              with:
+                  flutter-version-file: .fvmrc
+                  cache: true
+
+            - name: Install dependencies
+              run: flutter pub get
+
+            - name: Create .env & generate env code
+              run: |
+                  cat <<EOF > .env
+                  BASE_URL=${{ secrets.BASE_URL }}
+                  EOF
+                  dart run build_runner build --delete-conflicting-outputs
+
+            - name: Build APK
+              run: flutter build apk --release --obfuscate --split-debug-info=build/debug-info/android --verbose
+
+            - name: Upload APK artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: release-apk
+                  path: build/app/outputs/flutter-apk/app-release.apk
+                  retention-days: 30
