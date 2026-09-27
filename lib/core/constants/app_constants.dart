@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 abstract final class AppConstants {
   // ── Brand palette ─────────────────────────────────────────────────────────
-  static const Color primary = Color(0xFF000000);
+  static const Color primary = Color(0xFF376B8C);
   static const Color secondary = Color(0xFF000000);
   static const Color tertiary = Color(0xFF000000);
   static const Color surface = Color(0xFFf9f9f9);
