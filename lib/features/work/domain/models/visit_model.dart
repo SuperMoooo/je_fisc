@@ -1,7 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'work_model.freezed.dart';
-part 'work_model.g.dart';
+part 'visit_model.freezed.dart';
+part 'visit_model.g.dart';
 
 /// What the feature reasons about, and the shape it has on the wire.
 ///
@@ -14,30 +14,26 @@ part 'work_model.g.dart';
 /// Run `fvm dart run build_runner build --delete-conflicting-outputs` after
 /// editing this file.
 @freezed
-abstract class WorkModel with _$WorkModel {
+abstract class VisitModel with _$VisitModel {
   /// Freezed needs a private constructor before a class may declare members
   /// of its own — a getter, or a method that reads the fields.
-  const WorkModel._();
+  const VisitModel._();
 
-  const factory WorkModel({
+  const factory VisitModel({
     required int id,
-    required String clientName,
-    required String address,
-    required DateTime startDate,
-    required DateTime endDate,
-  }) = _WorkModel;
+    required int workId,
+    required DateTime date,
+  }) = _VisitModel;
 
-  factory WorkModel.fromJson(Map<String, dynamic> json) =>
-      _$WorkModelFromJson(json);
+  factory VisitModel.fromJson(Map<String, dynamic> json) =>
+      _$VisitModelFromJson(json);
 
-  /// A blank Work — what a create form starts from before anything is filled
+  /// A blank Visit — what a create form starts from before anything is filled
   /// in. Freezed does not write this one, so it is yours to keep in step with
   /// the fields above.
-  factory WorkModel.empty() => WorkModel(
+  factory VisitModel.empty() => VisitModel(
     id: 0,
-    clientName: '',
-    address: '',
-    startDate: DateTime.now(),
-    endDate: DateTime.now(),
+    workId: 0,
+    date: DateTime.now(),
   );
 }

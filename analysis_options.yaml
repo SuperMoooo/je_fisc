@@ -9,6 +9,7 @@ analyzer:
         - ios/Flutter/**
         - "**/*.g.dart"
         - "**/*.freezed.dart"
+        - android/**
     language:
         strict-raw-types: true
 
