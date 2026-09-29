@@ -1,8 +1,8 @@
 # Written by moarch — it records what the CLI generated so
 # `moarch update` can tell an untouched file from one you edited.
 # Safe to commit. Deleting it only makes `moarch update` more cautious.
-version: '9.2.0'
-generated_at: '2026-09-27T10:10:11.571592'
+version: '9.3.0'
+generated_at: '2026-09-29T19:26:32.806459'
 stack:
   - 'AI agent guide (AGENTS.md, CLAUDE.md, skills)'
   - 'Biometric authentication'
@@ -80,14 +80,21 @@ files:
   'lib/main.dart': '8464d281552d93a3'
   'lib/shared/widgets/app_status_view.dart': '498f1fd4cb301d10'
   'lib/shared/widgets/buttons/app_button.dart': 'c97fa54111cb2196'
+  'lib/shared/widgets/cards/app_card.dart': 'a15b3c9b03e49789'
   'lib/shared/widgets/empty_view.dart': '14aa08be4cc6cb8e'
   'lib/shared/widgets/error_view.dart': 'cd4b4c0c1c456451'
   'lib/shared/widgets/icons/app_leading_icon.dart': 'f4ef42962b07e3aa'
+  'lib/shared/widgets/inputs/app_date_input.dart': 'd257e2f5e1e3ec92'
   'lib/shared/widgets/inputs/app_input.dart': 'ec32e6c1e95b9a94'
   'lib/shared/widgets/inputs/app_input_config.dart': '081788ccfda2516e'
   'lib/shared/widgets/inputs/app_input_format.dart': '34d976f9ca0be175'
   'lib/shared/widgets/inputs/app_input_style.dart': '02b33254a5f8a7f4'
+  'lib/shared/widgets/inputs/app_time_input.dart': '636a6db1a52ab679'
+  'lib/shared/widgets/inputs/cupertino_picker_sheet.dart': '33b4f74d72fa536a'
   'lib/shared/widgets/inputs/input_title.dart': '8c090a37d1a748af'
+  'lib/shared/widgets/layouts/app_single_scroll_view.dart': '39667f40ed06ed81'
+  'lib/shared/widgets/lists/app_card_tile.dart': 'f2be77302c6c7a9e'
+  'lib/shared/widgets/lists/app_list_tile.dart': '31240dcaad62ca02'
   'lib/shared/widgets/loadings/app_loading_data.dart': 'e671ea2aca80d133'
   'lib/shared/widgets/mo_adapt.dart': '2c7523d611448b38'
   'lib/shared/widgets/overlays/app_bottom_modals.dart': 'e3cd7932e563f4a5'
@@ -95,4 +102,5 @@ files:
   'lib/shared/widgets/overlays/app_confirm_dialog.dart': '9c98973a790f766e'
   'lib/shared/widgets/overlays/app_dialogs.dart': 'a407c408a2c67ba5'
   'lib/shared/widgets/overlays/app_toast.dart': '2fe3a666015ad43d'
+  'lib/shared/widgets/text/app_heading.dart': '84703ab5b2b45c9f'
   'test/widget_test.dart': '262ff08744863ecb'

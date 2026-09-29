@@ -1,4 +1,3 @@
-
 import '../../core/utils/app_logger.dart';
 
 /// The kind of a failure, as a value rather than a type.
@@ -7,7 +6,15 @@ import '../../core/utils/app_logger.dart';
 /// is exhaustive and reads better, so new code rarely needs this — it is here
 /// for code written before [AppException] was sealed. If nothing in the
 /// project reads `.type`, delete this enum and the getter with it.
-enum AppExceptionType { network, server, notFound, auth, cancelled, unknown }
+enum AppExceptionType {
+  network,
+  server,
+  notFound,
+  auth,
+  cancelled,
+  storage,
+  unknown,
+}
 
 /// Every failure worth showing a user, as one closed family.
 ///
@@ -52,36 +59,39 @@ sealed class AppException implements Exception {
   /// Adding a subclass makes the switch below incomplete — that is the
   /// compiler asking you to give the new kind an enum value too.
   AppExceptionType get type => switch (this) {
-        NetworkException() => AppExceptionType.network,
-        ServerException() => AppExceptionType.server,
-        NotFoundException() => AppExceptionType.notFound,
-        AuthException() => AppExceptionType.auth,
-        CancelledException() => AppExceptionType.cancelled,
-        UnknownException() => AppExceptionType.unknown,
-      };
+    NetworkException() => AppExceptionType.network,
+    ServerException() => AppExceptionType.server,
+    NotFoundException() => AppExceptionType.notFound,
+    AuthException() => AppExceptionType.auth,
+    CancelledException() => AppExceptionType.cancelled,
+    StorageException() => AppExceptionType.storage,
+    UnknownException() => AppExceptionType.unknown,
+  };
 
   @override
   String toString() =>
       '$runtimeType(message: $message, statusCode: $statusCode)';
 
   factory AppException.noInternet() =>
-      const NetworkException(message: 'No internet connection');
+      const NetworkException(message: 'Sem ligação à internet');
 
   factory AppException.sessionExpired() =>
-      const ServerException(message: 'Session expired', statusCode: 401);
+      const ServerException(message: 'A sessão expirou', statusCode: 401);
 
   /// The user dismissed the flow. Nothing failed, so usually show nothing.
   factory AppException.cancelled() =>
-      const CancelledException(message: 'Cancelled');
+      const CancelledException(message: 'Cancelado');
 
   factory AppException.fromError(Object error, StackTrace stackTrace) {
     final message = error.toString();
-        appLogger.e('[AppException] — $message', error: error, stackTrace: stackTrace);
-    
+    appLogger.e(
+      '[AppException] — $message',
+      error: error,
+      stackTrace: stackTrace,
+    );
+
     return UnknownException(message: message);
   }
-
-
 }
 
 /// The request never reached the server — no connection, or it dropped before
@@ -112,6 +122,13 @@ final class AuthException extends AppException {
 /// failed, so this is the one kind normally shown as nothing at all.
 final class CancelledException extends AppException {
   const CancelledException({required super.message});
+}
+
+/// The on-device database refused a read or a write — a failed query, a
+/// constraint violation, a corrupt or locked file. Nothing to do with the
+/// network, so retrying online will not help.
+final class StorageException extends AppException {
+  const StorageException({required super.message});
 }
 
 /// Everything the boundary could not identify. [message] is the raw error, so

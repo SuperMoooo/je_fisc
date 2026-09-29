@@ -46,40 +46,37 @@ class AppLeadingIcon extends StatelessWidget {
   static const double _outlinedBorderWidth = 1.5;
 
   _LeadingIconSizeConfig _sizeConfig() => switch (size) {
-        AppLeadingIconSize.small => (
-            container: 32.0,
-            icon: AppConstants.iconSmall,
-          ),
-        AppLeadingIconSize.medium => (
-            container: AppConstants.touchTarget,
-            icon: AppConstants.iconMedium,
-          ),
-        AppLeadingIconSize.large => (
-            container: AppConstants.touchTarget + 16,
-            icon: AppConstants.iconLarge,
-          ),
-      };
+    AppLeadingIconSize.small => (container: 32.0, icon: AppConstants.iconSmall),
+    AppLeadingIconSize.medium => (
+      container: AppConstants.touchTarget,
+      icon: AppConstants.iconMedium,
+    ),
+    AppLeadingIconSize.large => (
+      container: AppConstants.touchTarget + 16,
+      icon: AppConstants.iconLarge,
+    ),
+  };
 
   /// The variant's color, plus the color that reads on top of it. Single
   /// source for every color the container paints.
   (Color, Color) _colorsOf(ThemeData theme) => switch (variant) {
-        AppLeadingIconVariant.primary => (
-            theme.colorScheme.primary,
-            theme.colorScheme.onPrimary,
-          ),
-        AppLeadingIconVariant.secondary => (
-            theme.colorScheme.secondary,
-            theme.colorScheme.onSecondary,
-          ),
-        AppLeadingIconVariant.tertiary => (
-            theme.colorScheme.tertiary,
-            theme.colorScheme.onTertiary,
-          ),
-        AppLeadingIconVariant.danger => (
-            theme.colorScheme.error,
-            theme.colorScheme.onError,
-          ),
-      };
+    AppLeadingIconVariant.primary => (
+      theme.colorScheme.primary,
+      theme.colorScheme.onPrimary,
+    ),
+    AppLeadingIconVariant.secondary => (
+      theme.colorScheme.secondary,
+      theme.colorScheme.onSecondary,
+    ),
+    AppLeadingIconVariant.tertiary => (
+      theme.colorScheme.tertiary,
+      theme.colorScheme.onTertiary,
+    ),
+    AppLeadingIconVariant.danger => (
+      theme.colorScheme.error,
+      theme.colorScheme.onError,
+    ),
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -96,12 +93,12 @@ class AppLeadingIcon extends StatelessWidget {
     final (backgroundColor, iconColor) = switch (type) {
       AppLeadingIconType.filled => (accent, onAccent),
       AppLeadingIconType.tonal => (
-          Color.alphaBlend(
-            accent.withValues(alpha: _tonalFillOpacity),
-            theme.colorScheme.surface,
-          ),
-          accent,
+        Color.alphaBlend(
+          accent.withValues(alpha: _tonalFillOpacity),
+          theme.colorScheme.surface,
         ),
+        accent,
+      ),
       AppLeadingIconType.outlined => (Colors.transparent, accent),
       AppLeadingIconType.plain => (Colors.transparent, accent),
     };

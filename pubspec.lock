@@ -864,6 +864,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
+  mo_infinite_scroll:
+    dependency: "direct main"
+    description:
+      name: mo_infinite_scroll
+      sha256: "519660a38a7279489506cf261efd8a3ff7e9937c6d010958d27d473d160724fa"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   mocktail:
     dependency: "direct dev"
     description:
@@ -913,7 +921,7 @@ packages:
     source: hosted
     version: "2.2.0"
   path:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path
       sha256: "75cca69d1490965be98c73ceaea117e8a04dd21217b37b292c9ddbec0d955bc5"
@@ -921,7 +929,7 @@ packages:
     source: hosted
     version: "1.9.1"
   path_provider:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path_provider
       sha256: a7f4874f987173da295a61c181b8ee71dab59b332a486b391babf26a1b884825

@@ -1,4 +1,7 @@
 import 'package:equatable/equatable.dart';
+import 'package:je_fisc/features/work/domain/models/visit_model.dart';
+import 'package:je_fisc/features/work/domain/models/work_model.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../../../core/utils/app_status.dart';
 
@@ -17,16 +20,35 @@ class WorkDetailState extends Equatable
     this.status = AppStatus.initial,
     this.errorMessage,
     this.successMessage,
+    this.work,
+    this.visits = const [],
   });
 
   /// The state the loading skeleton is traced from.
   ///
-  /// TODO: as you add fields, give them fake values here — Skeletonizer
-  /// shimmers the tree it is handed, and a body drawn from an empty state
-  /// traces to a blank screen. `BoneMock.name` / `BoneMock.words(3)`
-  /// (skeletonizer) hand out strings whose length becomes the width of the
-  /// bone.
-  static const placeholder = WorkDetailState(status: AppStatus.success);
+  /// Every field has fake values — Skeletonizer shimmers the tree it is
+  /// handed, and a body drawn from an empty state traces to a blank screen.
+  /// `BoneMock` strings' length becomes the width of the bone. `final`, not
+  /// `const`: the models hold `DateTime`s.
+  static final placeholder = WorkDetailState(
+    status: AppStatus.success,
+    work: WorkModel(
+      id: 0,
+      clientName: BoneMock.name,
+      address: BoneMock.address,
+      startDate: DateTime(2000),
+      endDate: DateTime(2000),
+    ),
+    visits: [
+      for (var i = 0; i < 3; i++)
+        VisitModel(
+          id: i,
+          workId: 0,
+          date: DateTime(2000),
+          categories: [BoneMock.words(1), BoneMock.words(2)],
+        ),
+    ],
+  );
 
   @override
   final AppStatus status;
@@ -43,15 +65,17 @@ class WorkDetailState extends Equatable
   /// sets it and not on the next one.
   final String? successMessage;
 
-  // TODO: add what the screen shows, e.g.
-  // `final List<WorkDetailModel> items;`. A field has to reach four places: the
-  // constructor, `copyWith`, `props` — without which two states compare equal
-  // and the second emit is dropped — and `placeholder`.
+  final WorkModel? work;
+
+  /// The work's visits, newest first, each with its pictures and categories.
+  final List<VisitModel> visits;
 
   WorkDetailState copyWith({
     AppStatus? status,
     String? errorMessage,
     String? successMessage,
+    WorkModel? work,
+    List<VisitModel>? visits,
   }) {
     return WorkDetailState(
       status: status ?? this.status,
@@ -59,6 +83,8 @@ class WorkDetailState extends Equatable
       // passed here is a message already shown.
       errorMessage: errorMessage,
       successMessage: successMessage,
+      work: work ?? this.work,
+      visits: visits ?? this.visits,
     );
   }
 
@@ -67,5 +93,11 @@ class WorkDetailState extends Equatable
       copyWith(status: status, errorMessage: errorMessage);
 
   @override
-  List<Object?> get props => [status, errorMessage, successMessage];
+  List<Object?> get props => [
+    status,
+    errorMessage,
+    successMessage,
+    work,
+    visits,
+  ];
 }

@@ -97,7 +97,7 @@ mixin ActionBlocMixin<E, S extends StatusState<S>> on Bloc<E, S> {
       emit(current.withStatus(failed, errorMessage: e.message));
     } catch (error, stackTrace) {
       addError(error, stackTrace);
-      emit(current.withStatus(failed, errorMessage: 'Unknown error'));
+      emit(current.withStatus(failed, errorMessage: 'Erro desconhecido'));
     }
   }
 }

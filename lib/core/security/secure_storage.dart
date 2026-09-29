@@ -42,9 +42,11 @@ class TokenStorage {
     try {
       final parts = token.split('.');
       if (parts.length != 3) return null;
-      final payload = json.decode(
-        utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
-      ) as Map<String, dynamic>;
+      final payload =
+          json.decode(
+                utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
+              )
+              as Map<String, dynamic>;
       // Adjust the claim name to whatever your backend puts the user id in.
       final id = payload['sub'] ?? payload['userId'] ?? payload['id'];
       return id?.toString();

@@ -1,4 +1,5 @@
 import '../../core/security/biometric_service.dart';
+import '../../core/services/local_file_store.dart';
 import '../../core/services/media_service.dart';
 import '../../core/services/permission_service.dart';
 import 'injector.dart';
@@ -13,6 +14,8 @@ void registerCoreServices() {
   getIt
     ..registerLazySingleton<PermissionService>(PermissionService.new)
     ..registerLazySingleton<MediaService>(
-        () => MediaService(getIt<PermissionService>()))
-    ..registerLazySingleton<BiometricService>(BiometricService.new);
+      () => MediaService(getIt<PermissionService>()),
+    )
+    ..registerLazySingleton<BiometricService>(BiometricService.new)
+    ..registerLazySingleton<LocalFileStore>(LocalFileStore.new);
 }

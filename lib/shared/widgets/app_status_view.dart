@@ -90,17 +90,17 @@ class AppStatusView extends StatelessWidget {
     return switch (status) {
       AppStatus.initial || AppStatus.loading => _loading(context),
       AppStatus.failure => ErrorView(
-          title: errorTitle ?? 'Something went wrong',
-          message: message,
-          onRetry: onRetry,
-        ),
+        title: errorTitle ?? 'Algo correu mal',
+        message: message,
+        onRetry: onRetry,
+      ),
       AppStatus.success when isEmpty => EmptyView(
-          title: emptyTitle ?? 'Nothing here yet',
-          message: emptyMessage ?? 'No items are available right now.',
-          icon: emptyIcon ?? Icons.inbox_outlined,
-          actionLabel: emptyActionLabel,
-          onAction: onEmptyAction,
-        ),
+        title: emptyTitle ?? 'Ainda não há nada aqui',
+        message: emptyMessage ?? 'De momento não há itens disponíveis.',
+        icon: emptyIcon ?? Icons.inbox_outlined,
+        actionLabel: emptyActionLabel,
+        onAction: onEmptyAction,
+      ),
       AppStatus.success => builder(context),
     };
   }

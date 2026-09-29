@@ -5,8 +5,8 @@ import '../../core/constants/app_constants.dart';
 class EmptyView extends StatelessWidget {
   const EmptyView({
     super.key,
-    this.title = 'Nothing here yet',
-    this.message = 'No items are available right now.',
+    this.title = 'Ainda não há nada aqui',
+    this.message = 'De momento não há itens disponíveis.',
     this.icon = Icons.inbox_outlined,
     this.actionLabel,
     this.onAction,
@@ -54,4 +54,3 @@ class EmptyView extends StatelessWidget {
     );
   }
 }
-

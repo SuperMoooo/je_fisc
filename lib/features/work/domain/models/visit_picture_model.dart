@@ -31,9 +31,6 @@ abstract class VisitPictureModel with _$VisitPictureModel {
   /// A blank VisitPicture — what a create form starts from before anything is filled
   /// in. Freezed does not write this one, so it is yours to keep in step with
   /// the fields above.
-  factory VisitPictureModel.empty() => VisitPictureModel(
-    id: 0,
-    visitId: 0,
-    picturePath: '',
-  );
+  factory VisitPictureModel.empty() =>
+      VisitPictureModel(id: 0, visitId: 0, picturePath: '');
 }

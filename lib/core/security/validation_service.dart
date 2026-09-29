@@ -14,17 +14,17 @@ enum InputType {
 
   /// How the type is named in a message — 'card number', not 'creditCard'.
   String get label => switch (this) {
-    InputType.text => 'text',
+    InputType.text => 'texto',
     InputType.email => 'email',
     InputType.url => 'URL',
-    InputType.phone => 'phone number',
-    InputType.password => 'password',
-    InputType.username => 'username',
-    InputType.number => 'number',
-    InputType.creditCard => 'card number',
-    InputType.cardExpiry => 'expiry date',
-    InputType.cvv => 'security code',
-    InputType.filePath => 'file path',
+    InputType.phone => 'número de telemóvel',
+    InputType.password => 'palavra-passe',
+    InputType.username => 'nome de utilizador',
+    InputType.number => 'número',
+    InputType.creditCard => 'número do cartão',
+    InputType.cardExpiry => 'data de validade',
+    InputType.cvv => 'código de segurança',
+    InputType.filePath => 'caminho do ficheiro',
   };
 }
 
@@ -137,17 +137,17 @@ class ValidationService {
     final cleaned = _clean(value, inputType, trim: trimWhitespace);
 
     if (cleaned.isEmpty) {
-      return ValidationResult.invalid('Cannot be blank', value);
+      return ValidationResult.invalid('Não pode estar em branco', value);
     }
     if (cleaned.length < minLength) {
       return ValidationResult.invalid(
-        'Must be at least $minLength characters',
+        'Deve ter pelo menos $minLength caracteres',
         value,
       );
     }
     if (cleaned.length > maxLength) {
       return ValidationResult.invalid(
-        'Must be at most $maxLength characters',
+        'Deve ter no máximo $maxLength caracteres',
         value,
       );
     }
@@ -184,7 +184,7 @@ class ValidationService {
     if (type == InputType.filePath) {
       for (final pattern in _pathTraversalPatterns) {
         if (pattern.hasMatch(value)) {
-          return 'Contains a path traversal sequence';
+          return 'Contém uma sequência de travessia de diretórios';
         }
       }
     }
@@ -193,7 +193,7 @@ class ValidationService {
     // The false-positive rate on prose is near zero, so free text keeps it.
     if (type == InputType.text) {
       for (final pattern in _markupPatterns) {
-        if (pattern.hasMatch(value)) return 'Contains scripts or markup';
+        if (pattern.hasMatch(value)) return 'Contém scripts ou código HTML';
       }
     }
 
@@ -206,54 +206,55 @@ class ValidationService {
     InputType.email =>
       value.length <= 254 && _emailRegex.hasMatch(value)
           ? null
-          : 'Invalid ${type.label}',
+          : 'Email inválido',
     InputType.url => _urlError(value),
     InputType.phone => _phoneError(value),
     InputType.username =>
       _usernameRegex.hasMatch(value)
           ? null
-          : 'Use 3-20 letters, numbers, - or _',
+          : 'Use 3 a 20 letras, números, - ou _',
     InputType.password => _passwordError(value),
-    InputType.number =>
-      num.tryParse(value) == null ? 'Invalid ${type.label}' : null,
+    InputType.number => num.tryParse(value) == null ? 'Número inválido' : null,
     InputType.creditCard => _cardError(value),
     InputType.cardExpiry => _expiryError(value),
     InputType.cvv =>
       _cvvRegex.hasMatch(value.replaceAll(_nonDigits, ''))
           ? null
-          : 'Invalid ${type.label}',
+          : 'Código de segurança inválido',
     InputType.text || InputType.filePath => null,
   };
 
   static String? _urlError(String value) {
     final uri = Uri.tryParse(value);
-    if (uri == null || !uri.hasScheme) return 'Invalid URL';
+    if (uri == null || !uri.hasScheme) return 'URL inválido';
 
     // Checked before the host so a `javascript:` or `file:` URL is reported as
     // the scheme problem it is. The allowlist is the point of validating a URL.
     if (uri.scheme != 'http' && uri.scheme != 'https') {
-      return 'Only http and https links are allowed';
+      return 'Só são permitidas ligações http e https';
     }
-    if (uri.host.isEmpty) return 'Invalid URL';
+    if (uri.host.isEmpty) return 'URL inválido';
     return null;
   }
 
   static String? _phoneError(String value) {
-    if (!_phoneShapeRegex.hasMatch(value)) return 'Invalid phone number';
+    if (!_phoneShapeRegex.hasMatch(value)) {
+      return 'Número de telemóvel inválido';
+    }
 
     // E.164 tops out at 15 digits, and nothing shorter than 7 is dialable.
     final digits = value.replaceAll(_nonDigits, '').length;
-    return digits < 7 || digits > 15 ? 'Invalid phone number' : null;
+    return digits < 7 || digits > 15 ? 'Número de telemóvel inválido' : null;
   }
 
   static String? _passwordError(String value) {
     final policy = passwordPolicy;
 
     if (value.length < policy.minLength) {
-      return 'Password must be at least ${policy.minLength} characters';
+      return 'A palavra-passe deve ter pelo menos ${policy.minLength} caracteres';
     }
     if (value.length > policy.maxLength) {
-      return 'Password must be at most ${policy.maxLength} characters';
+      return 'A palavra-passe deve ter no máximo ${policy.maxLength} caracteres';
     }
     if (policy.requiredClasses <= 0) return null;
 
@@ -265,25 +266,29 @@ class ValidationService {
     ].where((pattern) => pattern.hasMatch(value)).length;
 
     if (classes < policy.requiredClasses) {
-      return 'Password needs ${policy.requiredClasses} of: an upper case '
-          'letter, a lower case letter, a number, a symbol';
+      return 'A palavra-passe precisa de ${policy.requiredClasses} dos seguintes: uma '
+          'letra maiúscula, uma letra minúscula, um número, um símbolo';
     }
     return null;
   }
 
   static String? _cardError(String value) {
     final digits = value.replaceAll(_nonDigits, '');
-    if (digits.length < 13 || digits.length > 19) return 'Invalid card number';
-    return luhnCheck(digits) ? null : 'Invalid card number';
+    if (digits.length < 13 || digits.length > 19) {
+      return 'Número do cartão inválido';
+    }
+    return luhnCheck(digits) ? null : 'Número do cartão inválido';
   }
 
   /// Accepts whatever the field's mask produced — `MM/YY`, `MMYY` or `MM/YYYY`.
   static String? _expiryError(String value) {
     final digits = value.replaceAll(_nonDigits, '');
-    if (digits.length != 4 && digits.length != 6) return 'Invalid expiry date';
+    if (digits.length != 4 && digits.length != 6) {
+      return 'Data de validade inválida';
+    }
 
     final month = int.parse(digits.substring(0, 2));
-    if (month < 1 || month > 12) return 'Invalid expiry date';
+    if (month < 1 || month > 12) return 'Data de validade inválida';
 
     final year = digits.length == 4
         ? 2000 + int.parse(digits.substring(2))
@@ -292,7 +297,7 @@ class ValidationService {
     // Day 0 of the next month is the last day of this one — a card is good
     // through the end of the month it names.
     final expiresAt = DateTime(year, month + 1, 0, 23, 59, 59);
-    return expiresAt.isBefore(DateTime.now()) ? 'Card has expired' : null;
+    return expiresAt.isBefore(DateTime.now()) ? 'O cartão expirou' : null;
   }
 
   /// The Luhn checksum every card number carries. Public so a payment form can
@@ -338,7 +343,7 @@ class ValidationService {
       for (final entry in inputs.entries)
         entry.key: switch (types[entry.key]) {
           null => ValidationResult.invalid(
-            'No validation type defined',
+            'Nenhum tipo de validação definido',
             entry.value,
           ),
           final type => validate(

@@ -164,35 +164,22 @@ class AppToast {
   /// says what happened by feel as well as by color — the worse the news, the
   /// heavier the tap.
   static void _feedback(AppToastType type) => switch (type) {
-        AppToastType.success => HapticFeedback.lightImpact(),
-        AppToastType.warning => HapticFeedback.mediumImpact(),
-        AppToastType.error => HapticFeedback.heavyImpact(),
-        AppToastType.info => HapticFeedback.selectionClick(),
-      };
+    AppToastType.success => HapticFeedback.lightImpact(),
+    AppToastType.warning => HapticFeedback.mediumImpact(),
+    AppToastType.error => HapticFeedback.heavyImpact(),
+    AppToastType.info => HapticFeedback.selectionClick(),
+  };
 
   static (Color, IconData) _resolve(
     AppToastType type,
     AppStatusColors status,
     Color error,
-  ) =>
-      switch (type) {
-        AppToastType.success => (
-            status.success,
-            Icons.check_circle_outline,
-          ),
-        AppToastType.error => (
-            error,
-            Icons.error_outline,
-          ),
-        AppToastType.warning => (
-            status.warning,
-            Icons.warning_amber_rounded,
-          ),
-        AppToastType.info => (
-            status.info,
-            Icons.info_outline,
-          ),
-      };
+  ) => switch (type) {
+    AppToastType.success => (status.success, Icons.check_circle_outline),
+    AppToastType.error => (error, Icons.error_outline),
+    AppToastType.warning => (status.warning, Icons.warning_amber_rounded),
+    AppToastType.info => (status.info, Icons.info_outline),
+  };
 }
 
 /// Everything one call to [AppToast.show] asked for, in one object so that a
@@ -351,8 +338,10 @@ class _ToastOverlayState extends State<_ToastOverlay>
                   end: Offset.zero,
                 ).animate(_curve),
                 child: ScaleTransition(
-                  scale: Tween<double>(begin: AppToast._enterScale, end: 1)
-                      .animate(_curve),
+                  scale: Tween<double>(
+                    begin: AppToast._enterScale,
+                    end: 1,
+                  ).animate(_curve),
                   // Grows out of the edge it rose from, not out of its middle.
                   alignment: Alignment.bottomCenter,
                   child: Dismissible(
@@ -472,7 +461,9 @@ class _ToastCard extends StatelessWidget {
             child: Padding(
               // Centers a single line against the icon chip without moving a
               // two-line one off the top.
-              padding: const EdgeInsets.symmetric(vertical: AppConstants.space4),
+              padding: const EdgeInsets.symmetric(
+                vertical: AppConstants.space4,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -534,7 +525,7 @@ class _ToastCard extends StatelessWidget {
               icon: const Icon(Icons.close, size: AppConstants.iconSmall),
               color: colorScheme.onSurfaceVariant,
               visualDensity: VisualDensity.compact,
-              tooltip: 'Dismiss',
+              tooltip: 'Fechar',
             ),
         ],
       ),

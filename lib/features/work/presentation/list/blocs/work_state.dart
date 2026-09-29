@@ -11,20 +11,21 @@ import '../../../../../core/utils/app_status.dart';
 /// there is nothing to re-declare. The status itself is [AppStatus], shared by
 /// every screen, which is what lets `AppStatusView` draw it — and being a
 /// [StatusState] is what lets the bloc's `runAction` handle its errors.
+///
+/// The works themselves are not here: `MoInfiniteScroll` in `WorkList` keeps
+/// the pages it has loaded, and asks the bloc for the next one through
+/// `WorkPageRequested`. This state holds what decides *which* works — the
+/// search.
 class WorkState extends Equatable implements StatusState<WorkState> {
   const WorkState({
     this.status = AppStatus.initial,
     this.errorMessage,
     this.successMessage,
+    this.query = '',
   });
 
-  /// The state the loading skeleton is traced from.
-  ///
-  /// TODO: as you add fields, give them fake values here — Skeletonizer
-  /// shimmers the tree it is handed, and a body drawn from an empty state
-  /// traces to a blank screen. `BoneMock.name` / `BoneMock.words(3)`
-  /// (skeletonizer) hand out strings whose length becomes the width of the
-  /// bone.
+  /// The state the loading skeleton is traced from. The skeleton draws fake
+  /// works of its own (`WorkListSkeleton`), so there is nothing to fake here.
   static const placeholder = WorkState(status: AppStatus.success);
 
   @override
@@ -42,15 +43,14 @@ class WorkState extends Equatable implements StatusState<WorkState> {
   /// sets it and not on the next one.
   final String? successMessage;
 
-  // TODO: add what the screen shows, e.g.
-  // `final List<WorkModel> items;`. A field has to reach four places: the
-  // constructor, `copyWith`, `props` — without which two states compare equal
-  // and the second emit is dropped — and `placeholder`.
+  /// The search the list is showing, trimmed. Empty shows every work.
+  final String query;
 
   WorkState copyWith({
     AppStatus? status,
     String? errorMessage,
     String? successMessage,
+    String? query,
   }) {
     return WorkState(
       status: status ?? this.status,
@@ -58,6 +58,7 @@ class WorkState extends Equatable implements StatusState<WorkState> {
       // passed here is a message already shown.
       errorMessage: errorMessage,
       successMessage: successMessage,
+      query: query ?? this.query,
     );
   }
 
@@ -66,5 +67,5 @@ class WorkState extends Equatable implements StatusState<WorkState> {
       copyWith(status: status, errorMessage: errorMessage);
 
   @override
-  List<Object?> get props => [status, errorMessage, successMessage];
+  List<Object?> get props => [status, errorMessage, successMessage, query];
 }

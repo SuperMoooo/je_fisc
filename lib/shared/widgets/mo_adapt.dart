@@ -166,17 +166,17 @@ class MoAdapt extends StatelessWidget {
   /// [maybeOf] for a null-safe variant.
   static MoAdaptData of(BuildContext context) {
     final MoAdaptData? data = maybeOf(context);
-    assert(data != null,
-        'MoAdapt.of() was called with a context that has no MoAdapt ancestor.');
+    assert(
+      data != null,
+      'MoAdapt.of() was called with a context that has no MoAdapt ancestor.',
+    );
     return data!;
   }
 
   /// The [MoAdaptData] from the closest [MoAdapt] ancestor, or null if there
   /// is none.
   static MoAdaptData? maybeOf(BuildContext context) {
-    return context
-        .dependOnInheritedWidgetOfExactType<_MoAdaptScope>()
-        ?.data;
+    return context.dependOnInheritedWidgetOfExactType<_MoAdaptScope>()?.data;
   }
 
   double _scaleFor(Size screenSize) {
@@ -202,14 +202,22 @@ class MoAdapt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    assert(designSize.width > 0 && designSize.height > 0,
-        'designSize must have positive width and height.');
-    assert(minScale == null || minScale! > 0,
-        'minScale must be greater than zero.');
-    assert(maxScale == null || maxScale! > 0,
-        'maxScale must be greater than zero.');
-    assert(minScale == null || maxScale == null || minScale! <= maxScale!,
-        'minScale must not exceed maxScale.');
+    assert(
+      designSize.width > 0 && designSize.height > 0,
+      'designSize must have positive width and height.',
+    );
+    assert(
+      minScale == null || minScale! > 0,
+      'minScale must be greater than zero.',
+    );
+    assert(
+      maxScale == null || maxScale! > 0,
+      'maxScale must be greater than zero.',
+    );
+    assert(
+      minScale == null || maxScale == null || minScale! <= maxScale!,
+      'minScale must not exceed maxScale.',
+    );
     // Derive metrics directly from the FlutterView so MoAdapt works whether
     // or not an ambient MediaQuery exists, and rebuilds on metric changes
     // (resize, rotation, keyboard).
@@ -223,8 +231,10 @@ class MoAdapt extends StatelessWidget {
     final MediaQueryData mediaQuery = MediaQuery.of(context);
     final Size screenSize = mediaQuery.size;
     final double scale = _scaleFor(screenSize);
-    final Size adaptedSize =
-        Size(screenSize.width / scale, screenSize.height / scale);
+    final Size adaptedSize = Size(
+      screenSize.width / scale,
+      screenSize.height / scale,
+    );
 
     return MediaQuery(
       // Present all metrics in design-space units so that SafeArea, dialogs,
@@ -265,10 +275,7 @@ class MoAdapt extends StatelessWidget {
         child: FittedBox(
           fit: BoxFit.fill,
           alignment: Alignment.topLeft,
-          child: SizedBox.fromSize(
-            size: adaptedSize,
-            child: child,
-          ),
+          child: SizedBox.fromSize(size: adaptedSize, child: child),
         ),
       ),
     );

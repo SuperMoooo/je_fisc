@@ -15,14 +15,14 @@ class BiometricService {
 
   Future<bool> authenticate() {
     return _auth.authenticate(
-      localizedReason: 'Please authenticate to continue',
+      localizedReason: 'Autentique-se para continuar',
       biometricOnly: false,
       authMessages: const <AuthMessages>[
         AndroidAuthMessages(
-          signInTitle: 'Authentication required',
-          cancelButton: 'Cancel',
+          signInTitle: 'Autenticação necessária',
+          cancelButton: 'Cancelar',
         ),
-        IOSAuthMessages(cancelButton: 'Cancel'),
+        IOSAuthMessages(cancelButton: 'Cancelar'),
       ],
     );
   }

@@ -11,7 +11,9 @@ sealed class WorkDetailEvent extends Equatable {
 
 /// Loads the screen. Dispatched when it opens, and again to refresh or retry.
 final class WorkDetailStarted extends WorkDetailEvent {
-  const WorkDetailStarted();
+  const WorkDetailStarted({required this.workId});
+
+  final int workId;
 }
 
 // TODO: one event per action the screen can take.

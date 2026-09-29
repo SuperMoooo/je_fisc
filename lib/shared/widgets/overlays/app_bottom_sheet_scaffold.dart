@@ -80,16 +80,14 @@ class AppBottomSheetScaffold extends StatelessWidget {
     final (background, foreground) = switch (closeType) {
       AppSheetCloseType.filled => (accent, theme.colorScheme.surface),
       AppSheetCloseType.tonal => (
-          Color.alphaBlend(
-            accent.withValues(alpha: _closeTonalOpacity),
-            theme.colorScheme.surface,
-          ),
-          accent,
+        Color.alphaBlend(
+          accent.withValues(alpha: _closeTonalOpacity),
+          theme.colorScheme.surface,
         ),
-      AppSheetCloseType.outlined || AppSheetCloseType.ghost => (
-          Colors.transparent,
-          accent,
-        ),
+        accent,
+      ),
+      AppSheetCloseType.outlined ||
+      AppSheetCloseType.ghost => (Colors.transparent, accent),
     };
 
     return Tooltip(
@@ -147,9 +145,11 @@ class AppBottomSheetScaffold extends StatelessWidget {
                   width: handleWidth,
                   height: handleHeight,
                   decoration: BoxDecoration(
-                    color: handleColor ??
-                        theme.colorScheme.onSurfaceVariant
-                            .withValues(alpha: _handleOpacity),
+                    color:
+                        handleColor ??
+                        theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: _handleOpacity,
+                        ),
                     borderRadius: AppConstants.borderRadiusFull,
                   ),
                 ),

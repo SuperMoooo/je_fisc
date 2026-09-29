@@ -72,7 +72,7 @@ class AppInputConfig {
     this.size = AppInputSize.medium,
     this.showRequiredMarker = true,
     this.requiredMarker = ' *',
-    this.requiredMessage = 'This field is required',
+    this.requiredMessage = 'Este campo é obrigatório',
     this.labelGap = AppConstants.space8,
     this.floatingLabelBehavior = FloatingLabelBehavior.auto,
     this.showCounter = false,

@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'visit_picture_model.dart';
+
 part 'visit_model.freezed.dart';
 part 'visit_model.g.dart';
 
@@ -23,6 +25,16 @@ abstract class VisitModel with _$VisitModel {
     required int id,
     required int workId,
     required DateTime date,
+
+    /// Loaded with the visit by `fetchVisits`. Not columns of the `visits`
+    /// row, so JSON leaves them out both ways and `toJson()` stays a row the
+    /// database can take as-is.
+    @Default([])
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    List<VisitPictureModel> pictures,
+    @Default([])
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    List<String> categories,
   }) = _VisitModel;
 
   factory VisitModel.fromJson(Map<String, dynamic> json) =>
@@ -31,9 +43,6 @@ abstract class VisitModel with _$VisitModel {
   /// A blank Visit — what a create form starts from before anything is filled
   /// in. Freezed does not write this one, so it is yours to keep in step with
   /// the fields above.
-  factory VisitModel.empty() => VisitModel(
-    id: 0,
-    workId: 0,
-    date: DateTime.now(),
-  );
+  factory VisitModel.empty() =>
+      VisitModel(id: 0, workId: 0, date: DateTime.now());
 }

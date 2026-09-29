@@ -31,9 +31,6 @@ abstract class VisitCategoryModel with _$VisitCategoryModel {
   /// A blank VisitCategory — what a create form starts from before anything is filled
   /// in. Freezed does not write this one, so it is yours to keep in step with
   /// the fields above.
-  factory VisitCategoryModel.empty() => VisitCategoryModel(
-    id: 0,
-    visitId: 0,
-    category: '',
-  );
+  factory VisitCategoryModel.empty() =>
+      VisitCategoryModel(id: 0, visitId: 0, category: '');
 }

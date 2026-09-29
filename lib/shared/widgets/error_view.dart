@@ -8,7 +8,7 @@ import '../../core/constants/app_constants.dart';
 class ErrorView extends StatelessWidget {
   const ErrorView({
     super.key,
-    this.title = 'Something went wrong',
+    this.title = 'Algo correu mal',
     this.message,
     this.icon = Icons.error_outline,
     this.onRetry,
@@ -38,7 +38,7 @@ class ErrorView extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              message ?? 'An unknown error occurred',
+              message ?? 'Ocorreu um erro desconhecido',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,
               ),
@@ -49,7 +49,7 @@ class ErrorView extends StatelessWidget {
               FilledButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Try again'),
+                label: const Text('Tentar novamente'),
               ),
             ],
           ],
@@ -58,4 +58,3 @@ class ErrorView extends StatelessWidget {
     );
   }
 }
-

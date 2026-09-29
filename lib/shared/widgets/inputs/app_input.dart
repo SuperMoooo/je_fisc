@@ -245,7 +245,7 @@ class _AppInputState extends State<AppInput> {
         HapticFeedback.selectionClick();
         setState(() => _obscured = !_obscured);
       },
-      tooltip: _obscured ? 'Show' : 'Hide',
+      tooltip: _obscured ? 'Mostrar' : 'Ocultar',
       icon: Icon(
         _obscured ? Icons.visibility_off_outlined : Icons.visibility_outlined,
       ),

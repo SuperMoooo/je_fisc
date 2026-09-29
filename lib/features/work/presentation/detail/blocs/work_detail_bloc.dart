@@ -30,9 +30,15 @@ class WorkDetailBloc extends Bloc<WorkDetailEvent, WorkDetailState>
     WorkDetailStarted event,
     Emitter<WorkDetailState> emit,
   ) => runAction(emit, (current) async {
-    // TODO: put what this returns onto the state — add a field for it in
-    // WorkDetailState, and pass it in the copyWith below.
-    await _repo.fetchAll();
-    return current.copyWith(status: AppStatus.success);
+    // One after the other on purpose: `(a, b).wait` would wrap a failure in
+    // a ParallelWaitError, which runAction does not recognise as the
+    // AppException inside it. Both are local reads, so nothing is lost.
+    final work = await _repo.fetchWork(id: event.workId);
+    final visits = await _repo.fetchVisits(event.workId);
+    return current.copyWith(
+      status: AppStatus.success,
+      work: work,
+      visits: visits,
+    );
   });
 }

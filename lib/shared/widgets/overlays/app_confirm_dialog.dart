@@ -15,8 +15,8 @@ class AppConfirmDialog extends StatelessWidget {
     this.message,
     this.icon,
     this.variant = AppButtonVariant.primary,
-    this.confirmLabel = 'Confirm',
-    this.cancelLabel = 'Cancel',
+    this.confirmLabel = 'Confirmar',
+    this.cancelLabel = 'Cancelar',
   });
 
   final String title;
@@ -37,8 +37,8 @@ class AppConfirmDialog extends StatelessWidget {
     String? message,
     IconData? icon,
     AppButtonVariant variant = AppButtonVariant.primary,
-    String confirmLabel = 'Confirm',
-    String cancelLabel = 'Cancel',
+    String confirmLabel = 'Confirmar',
+    String cancelLabel = 'Cancelar',
   }) async {
     final confirmed = await dialogs.showAppDialog<bool>(
       child: AppConfirmDialog(

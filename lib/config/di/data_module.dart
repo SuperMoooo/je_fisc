@@ -1,4 +1,6 @@
+import 'package:sqflite/sqflite.dart';
 
+import '../../core/services/local_file_store.dart';
 import 'injector.dart';
 import '../../features/work/data/datasources/work_local_datasource.dart';
 import '../../features/work/data/repositories/work_repository_impl.dart';
@@ -12,12 +14,10 @@ import '../../features/work/domain/repositories/work_repository.dart';
 void registerDataLayer() {
   // ── Work ────────────────────────────────────────────────────
   getIt.registerLazySingleton<WorkLocalDataSource>(
-    WorkLocalDataSource.new,
+    () => WorkLocalDataSource(getIt<Database>(), getIt<LocalFileStore>()),
   );
   getIt.registerLazySingleton<WorkRepository>(
-    () => WorkRepositoryImpl(
-      getIt<WorkLocalDataSource>(),
-    ),
+    () => WorkRepositoryImpl(getIt<WorkLocalDataSource>()),
   );
 
   // moarch:registrations — `moarch create feature` inserts each new
