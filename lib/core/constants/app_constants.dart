@@ -11,8 +11,8 @@ abstract final class AppConstants {
   static const Color error = Color(0xFFba1a1a);
 
   // ── Surface layers ────────────────────────────────────────────────────────
-  static const Color surfaceContainerLowest = Color(0xFF000000);
-  static const Color surfaceContainerLow = Color(0xFF000000);
+  static const Color surfaceContainerLowest = Color(0xFFFFFFFF);
+  static const Color surfaceContainerLow = Color(0xFFFFFFFF);
   static const Color surfaceContainerHighest = Color(0xFF000000);
 
   // ── Status colors ─────────────────────────────────────────────────────────
@@ -25,7 +25,7 @@ abstract final class AppConstants {
   // Null uses the platform default. Declare a font under `flutter: fonts:` in
   // pubspec.yaml and name it here, or add google_fonts and swap AppTheme's
   // textTheme for GoogleFonts.interTextTheme(...).
-  static const String? fontFamily = null;
+  static const String fontFamily = "Inter";
 
   // ── Avatar background fallbacks ───────────────────────────────────────────
   static const List<Color> avatarPalette = [

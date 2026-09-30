@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
+import 'package:flutter/foundation.dart';
 import 'package:je_fisc/config/di/injector.dart';
 import 'package:je_fisc/core/security/biometric_service.dart';
 
@@ -27,7 +28,7 @@ class WorkBloc extends Bloc<WorkEvent, WorkState>
       runAction(emit, (current) async {
         final authenticated = await getIt<BiometricService>()
             .verifyUserLocalAuth();
-        if (!authenticated) {
+        if (!authenticated && !kDebugMode) {
           return current.copyWith(
             status: AppStatus.failure,
             errorMessage: "Não autenticado",

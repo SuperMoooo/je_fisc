@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:je_fisc/config/router/app_router.dart';
+import 'package:je_fisc/config/router/app_routes.dart';
+import 'package:je_fisc/core/utils/extensions.dart';
+import 'package:je_fisc/shared/widgets/buttons/app_button.dart';
 
 import '../../../../../core/constants/app_constants.dart';
 import '../../../../../shared/widgets/app_status_view.dart';
@@ -40,26 +44,32 @@ class WorkView extends StatelessWidget {
             message: state.errorMessage,
             onRetry: () => context.read<WorkBloc>().add(const WorkStarted()),
             skeleton: (context) => const WorkListSkeleton(),
-            builder: (context) => Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    AppConstants.space12,
-                    AppConstants.space12,
-                    AppConstants.space12,
-                    0,
+            builder: (context) => Padding(
+              padding: AppConstants.paddingPage,
+              child: Column(
+                crossAxisAlignment: .end,
+                spacing: AppConstants.space12,
+                children: [
+                  WorkSearchField(initialQuery: state.query),
+                  SizedBox(
+                    width: context.screenWidth * 0.35,
+                    child: AppButton(
+                      size: AppButtonSize.small,
+                      variant: AppButtonVariant.secondary,
+                      label: "Nova Obra",
+                      onPressed: () => appRouter.push(AppRoutes.createWork),
+                    ),
                   ),
-                  child: WorkSearchField(initialQuery: state.query),
-                ),
-                Expanded(
-                  // Keyed by the query: a new search starts a new list from
-                  // page 1 instead of appending to the old results.
-                  child: WorkList(
-                    key: ValueKey(state.query),
-                    query: state.query,
+                  Expanded(
+                    // Keyed by the query: a new search starts a new list from
+                    // page 1 instead of appending to the old results.
+                    child: WorkList(
+                      key: ValueKey(state.query),
+                      query: state.query,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

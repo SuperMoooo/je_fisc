@@ -19,7 +19,7 @@ class WorkCard extends StatelessWidget {
       title: work.clientName,
       subtitle:
           '${work.address}\n'
-          '${work.startDate.formattedDate} – ${work.endDate.formattedDate}',
+          '${work.startDate.formattedDate} - ${work.endDate.formattedDate}',
       showChevron: onTap != null,
       onTap: onTap,
     );

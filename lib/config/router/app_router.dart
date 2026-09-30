@@ -1,6 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:je_fisc/core/utils/extensions.dart';
+import 'package:je_fisc/features/work/presentation/create/pages/work_create_page.dart';
+import 'package:je_fisc/features/work/presentation/detail/pages/work_detail_page.dart';
 
 import '../../features/work/presentation/list/pages/work_page.dart';
 import './app_routes.dart';
@@ -21,6 +24,18 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: AppRoutes.work,
       builder: (context, state) => const WorkPage(),
+      routes: [
+        GoRoute(
+          path: AppRoutes.createWork,
+          builder: (context, state) => const WorkCreatePage(),
+        ),
+        GoRoute(
+          path: AppRoutes.workDetails,
+          builder: (context, state) => WorkDetailPage(
+            workId: state.pathParameters["workId"]?.toIntOrNull ?? 0,
+          ),
+        ),
+      ],
     ),
     // moarch:routes
 

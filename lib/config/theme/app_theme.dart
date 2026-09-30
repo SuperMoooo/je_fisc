@@ -4,26 +4,110 @@ import '../../core/constants/app_constants.dart';
 import 'app_status_colors.dart';
 
 abstract final class AppTheme {
-  static const String? _fontFamily = AppConstants.fontFamily;
+  static const String _fontFamily = AppConstants.fontFamily;
 
   // Colors are left null on purpose, so each style inherits the right
   // on-surface color for the current brightness.
   static const TextTheme _textTheme = TextTheme(
-    displayLarge: TextStyle(fontFamily: _fontFamily, fontSize: 57, height: 1.12, fontWeight: FontWeight.w400, letterSpacing: -0.25),
-    displayMedium: TextStyle(fontFamily: _fontFamily, fontSize: 45, height: 1.16, fontWeight: FontWeight.w400),
-    displaySmall: TextStyle(fontFamily: _fontFamily, fontSize: 36, height: 1.22, fontWeight: FontWeight.w400),
-    headlineLarge: TextStyle(fontFamily: _fontFamily, fontSize: AppConstants.fontSize28 + 4, height: 1.25, fontWeight: FontWeight.w600),
-    headlineMedium: TextStyle(fontFamily: _fontFamily, fontSize: AppConstants.fontSize28, height: 1.29, fontWeight: FontWeight.w600),
-    headlineSmall: TextStyle(fontFamily: _fontFamily, fontSize: 24, height: 1.33, fontWeight: FontWeight.w600),
-    titleLarge: TextStyle(fontFamily: _fontFamily, fontSize: AppConstants.fontSize22, height: 1.27, fontWeight: FontWeight.w600),
-    titleMedium: TextStyle(fontFamily: _fontFamily, fontSize: AppConstants.fontSize16, height: 1.50, fontWeight: FontWeight.w600, letterSpacing: 0.15),
-    titleSmall: TextStyle(fontFamily: _fontFamily, fontSize: AppConstants.fontSize14, height: 1.43, fontWeight: FontWeight.w600, letterSpacing: 0.1),
-    bodyLarge: TextStyle(fontFamily: _fontFamily, fontSize: AppConstants.fontSize16, height: 1.50, fontWeight: FontWeight.w400, letterSpacing: 0.5),
-    bodyMedium: TextStyle(fontFamily: _fontFamily, fontSize: AppConstants.fontSize14, height: 1.43, fontWeight: FontWeight.w400, letterSpacing: 0.25),
-    bodySmall: TextStyle(fontFamily: _fontFamily, fontSize: AppConstants.fontSize12, height: 1.33, fontWeight: FontWeight.w400, letterSpacing: 0.4),
-    labelLarge: TextStyle(fontFamily: _fontFamily, fontSize: AppConstants.fontSize14, height: 1.43, fontWeight: FontWeight.w600, letterSpacing: 0.1),
-    labelMedium: TextStyle(fontFamily: _fontFamily, fontSize: AppConstants.fontSize12, height: 1.33, fontWeight: FontWeight.w600, letterSpacing: 0.5),
-    labelSmall: TextStyle(fontFamily: _fontFamily, fontSize: AppConstants.fontSize11, height: 1.45, fontWeight: FontWeight.w600, letterSpacing: 0.5),
+    displayLarge: TextStyle(
+      fontFamily: _fontFamily,
+      fontSize: 57,
+      height: 1.12,
+      fontWeight: FontWeight.w400,
+      letterSpacing: -0.25,
+    ),
+    displayMedium: TextStyle(
+      fontFamily: _fontFamily,
+      fontSize: 45,
+      height: 1.16,
+      fontWeight: FontWeight.w400,
+    ),
+    displaySmall: TextStyle(
+      fontFamily: _fontFamily,
+      fontSize: 36,
+      height: 1.22,
+      fontWeight: FontWeight.w400,
+    ),
+    headlineLarge: TextStyle(
+      fontFamily: _fontFamily,
+      fontSize: AppConstants.fontSize28 + 4,
+      height: 1.25,
+      fontWeight: FontWeight.w600,
+    ),
+    headlineMedium: TextStyle(
+      fontFamily: _fontFamily,
+      fontSize: AppConstants.fontSize28,
+      height: 1.29,
+      fontWeight: FontWeight.w600,
+    ),
+    headlineSmall: TextStyle(
+      fontFamily: _fontFamily,
+      fontSize: 24,
+      height: 1.33,
+      fontWeight: FontWeight.w600,
+    ),
+    titleLarge: TextStyle(
+      fontFamily: _fontFamily,
+      fontSize: AppConstants.fontSize22,
+      height: 1.27,
+      fontWeight: FontWeight.w600,
+    ),
+    titleMedium: TextStyle(
+      fontFamily: _fontFamily,
+      fontSize: AppConstants.fontSize16,
+      height: 1.50,
+      fontWeight: FontWeight.w600,
+      letterSpacing: 0.15,
+    ),
+    titleSmall: TextStyle(
+      fontFamily: _fontFamily,
+      fontSize: AppConstants.fontSize14,
+      height: 1.43,
+      fontWeight: FontWeight.w600,
+      letterSpacing: 0.1,
+    ),
+    bodyLarge: TextStyle(
+      fontFamily: _fontFamily,
+      fontSize: AppConstants.fontSize16,
+      height: 1.50,
+      fontWeight: FontWeight.w400,
+      letterSpacing: 0.5,
+    ),
+    bodyMedium: TextStyle(
+      fontFamily: _fontFamily,
+      fontSize: AppConstants.fontSize14,
+      height: 1.43,
+      fontWeight: FontWeight.w400,
+      letterSpacing: 0.25,
+    ),
+    bodySmall: TextStyle(
+      fontFamily: _fontFamily,
+      fontSize: AppConstants.fontSize12,
+      height: 1.33,
+      fontWeight: FontWeight.w400,
+      letterSpacing: 0.4,
+    ),
+    labelLarge: TextStyle(
+      fontFamily: _fontFamily,
+      fontSize: AppConstants.fontSize14,
+      height: 1.43,
+      fontWeight: FontWeight.w600,
+      letterSpacing: 0.1,
+    ),
+    labelMedium: TextStyle(
+      fontFamily: _fontFamily,
+      fontSize: AppConstants.fontSize12,
+      height: 1.33,
+      fontWeight: FontWeight.w600,
+      letterSpacing: 0.5,
+    ),
+    labelSmall: TextStyle(
+      fontFamily: _fontFamily,
+      fontSize: AppConstants.fontSize11,
+      height: 1.45,
+      fontWeight: FontWeight.w600,
+      letterSpacing: 0.5,
+    ),
   );
 
   static ThemeData get light => ThemeData(

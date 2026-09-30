@@ -32,5 +32,5 @@ abstract class VisitCategoryModel with _$VisitCategoryModel {
   /// in. Freezed does not write this one, so it is yours to keep in step with
   /// the fields above.
   factory VisitCategoryModel.empty() =>
-      VisitCategoryModel(id: 0, visitId: 0, category: '');
+      const VisitCategoryModel(id: 0, visitId: 0, category: '');
 }
