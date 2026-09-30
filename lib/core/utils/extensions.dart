@@ -39,6 +39,23 @@ extension FormX on GlobalKey<FormState> {
   bool get isValid => currentState?.validate() ?? false;
 }
 
+extension TextEditingControllerX on TextEditingController {
+  /// The text without its surrounding whitespace — what a form submits:
+  /// `login(email: _email.trimmed, password: _password.text)`.
+  ///
+  /// A getter rather than a controller that trims itself: rewriting the
+  /// field while the user types would eat the space between two words and
+  /// jump the cursor. Leave passwords untrimmed — a space can be part of one.
+  String get trimmed => text.trim();
+
+  /// [trimmed], or null when that leaves nothing — for an optional field the
+  /// API wants absent rather than empty.
+  String? get trimmedOrNull {
+    final value = text.trim();
+    return value.isEmpty ? null : value;
+  }
+}
+
 extension StringX on String {
   bool get isValidEmail =>
       RegExp(r'^[\w\-.]+@([\w\-]+\.)+[\w\-]{2,}$').hasMatch(this);

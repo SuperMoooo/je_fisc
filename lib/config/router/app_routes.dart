@@ -12,7 +12,7 @@ abstract final class AppRoutes {
   static const work = '/work';
   static const createWork = '/work/create';
   static const workDetails = '/work/:workId';
-  static String workDetailOf(String id) => '/work/$id';
+  static String workDetailOf(int id) => '/work/$id';
   // moarch:routes
 
   // Dynamic routes: the constant holds the pattern GoRouter matches on, the

@@ -2,7 +2,7 @@
 # `moarch update` can tell an untouched file from one you edited.
 # Safe to commit. Deleting it only makes `moarch update` more cautious.
 version: '9.3.0'
-generated_at: '2026-09-29T19:26:32.806459'
+generated_at: '2026-09-30T14:37:47.993421'
 stack:
   - 'AI agent guide (AGENTS.md, CLAUDE.md, skills)'
   - 'Biometric authentication'
@@ -76,7 +76,7 @@ files:
   'lib/core/utils/app_bloc_observer.dart': 'cb7621d144773eb5'
   'lib/core/utils/app_logger.dart': 'cf79d3a1ed3b3372'
   'lib/core/utils/app_status.dart': '534e1162106d4399'
-  'lib/core/utils/extensions.dart': 'e9c858107a473f3a'
+  'lib/core/utils/extensions.dart': '393edb8cfd6ac139'
   'lib/main.dart': '8464d281552d93a3'
   'lib/shared/widgets/app_status_view.dart': '498f1fd4cb301d10'
   'lib/shared/widgets/buttons/app_button.dart': 'c97fa54111cb2196'

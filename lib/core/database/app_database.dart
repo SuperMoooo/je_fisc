@@ -18,25 +18,28 @@ abstract final class AppDatabase {
   /// One entry per schema version: `_migrations[0]` takes an empty database
   /// to version 1, `_migrations[1]` takes version 1 to 2, and so on.
   static final List<Future<void> Function(Transaction txn)> _migrations = [
-    // v1 — works. Column names match WorkModel's JSON keys, so a row goes
-    // through `WorkModel.fromJson` / `toJson` unchanged.
+    // v1 — the initial schema.
     (txn) async {
+      // Works. Column names match WorkModel's JSON keys, so a row goes
+      // through `WorkModel.fromJson` / `toJson` unchanged. `search_key` is
+      // what the works search matches against: see [SearchKeys.work]; the
+      // datasource writes it with every save.
       await txn.execute('''
         CREATE TABLE ${Tables.works} (
           id          INTEGER PRIMARY KEY AUTOINCREMENT,
           client_name TEXT    NOT NULL,
           address     TEXT    NOT NULL,
           start_date  TEXT    NOT NULL,
-          end_date    TEXT    NOT NULL
+          end_date    TEXT,
+          search_key  TEXT    NOT NULL DEFAULT ''
         )
       ''');
-    },
-    // v2 — a work's visits, and each visit's pictures and categories.
-    // Deleting a work deletes its visits, and a visit its pictures and
-    // categories (ON DELETE CASCADE; foreign keys are switched on in
-    // `onConfigure`). The picture files on disk are not rows — deleting them
-    // is the datasource's job.
-    (txn) async {
+
+      // A work's visits, and each visit's pictures and categories.
+      // Deleting a work deletes its visits, and a visit its pictures and
+      // categories (ON DELETE CASCADE; foreign keys are switched on in
+      // `onConfigure`). The picture files on disk are not rows — deleting
+      // them is the datasource's job.
       await txn.execute('''
         CREATE TABLE ${Tables.visits} (
           id      INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -73,32 +76,6 @@ abstract final class AppDatabase {
       ''');
       // The UNIQUE constraint above already indexes visit_id first, so
       // lookups by visit need no index of their own.
-    },
-    // v3 — works.search_key, what the works search matches against: see
-    // [SearchKeys.work]. Rows saved before this version are filled in here;
-    // from now on the datasource writes it with every save.
-    (txn) async {
-      await txn.execute(
-        "ALTER TABLE ${Tables.works} "
-        "ADD COLUMN search_key TEXT NOT NULL DEFAULT ''",
-      );
-      final rows = await txn.query(
-        Tables.works,
-        columns: ['id', 'client_name', 'address'],
-      );
-      for (final row in rows) {
-        await txn.update(
-          Tables.works,
-          {
-            'search_key': SearchKeys.work(
-              clientName: row['client_name']! as String,
-              address: row['address']! as String,
-            ),
-          },
-          where: 'id = ?',
-          whereArgs: [row['id']],
-        );
-      }
     },
   ];
 

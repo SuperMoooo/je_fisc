@@ -24,7 +24,7 @@ abstract class WorkModel with _$WorkModel {
     required String clientName,
     required String address,
     required DateTime startDate,
-    required DateTime endDate,
+    DateTime? endDate,
   }) = _WorkModel;
 
   factory WorkModel.fromJson(Map<String, dynamic> json) =>

@@ -17,6 +17,7 @@ class WorkCreateState extends Equatable
     this.status = AppStatus.initial,
     this.errorMessage,
     this.successMessage,
+    this.createdWorkId,
   });
 
   /// The state the loading skeleton is traced from.
@@ -43,15 +44,13 @@ class WorkCreateState extends Equatable
   /// sets it and not on the next one.
   final String? successMessage;
 
-  // TODO: add what the screen shows, e.g.
-  // `final List<WorkCreateModel> items;`. A field has to reach four places: the
-  // constructor, `copyWith`, `props` — without which two states compare equal
-  // and the second emit is dropped — and `placeholder`.
+  final int? createdWorkId;
 
   WorkCreateState copyWith({
     AppStatus? status,
     String? errorMessage,
     String? successMessage,
+    int? createdWorkId,
   }) {
     return WorkCreateState(
       status: status ?? this.status,
@@ -59,6 +58,7 @@ class WorkCreateState extends Equatable
       // passed here is a message already shown.
       errorMessage: errorMessage,
       successMessage: successMessage,
+      createdWorkId: createdWorkId,
     );
   }
 
@@ -67,5 +67,10 @@ class WorkCreateState extends Equatable
       copyWith(status: status, errorMessage: errorMessage);
 
   @override
-  List<Object?> get props => [status, errorMessage, successMessage];
+  List<Object?> get props => [
+    status,
+    errorMessage,
+    successMessage,
+    createdWorkId,
+  ];
 }
