@@ -9,10 +9,15 @@ abstract final class AppRoutes {
 
   // `moarch create feature` adds each feature's path above the next line —
   // keep it.
+  // Full locations — navigate with these.
   static const work = '/work';
-  static const createWork = '/work/create';
-  static const workDetails = '/work/:workId';
-  static String workDetailOf(int id) => '/work/$id';
+  static const createWork = '$work/$createWorkSegment';
+  static String workDetailOf(int id) => '$work/$id';
+
+  // Child segments of [work] — GoRouter joins a nested route's path onto its
+  // parent's, so the sub-routes in app_router.dart use these, not full paths.
+  static const createWorkSegment = 'create';
+  static const workDetailsSegment = ':workId';
   // moarch:routes
 
   // Dynamic routes: the constant holds the pattern GoRouter matches on, the

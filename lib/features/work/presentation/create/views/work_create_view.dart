@@ -54,11 +54,13 @@ class _WorkCreateViewState extends State<WorkCreateView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: SafeArea(
         child: BlocConsumer<WorkCreateBloc, WorkCreateState>(
           listenWhen: (previous, current) =>
               previous.errorMessage != current.errorMessage ||
-              previous.successMessage != current.successMessage,
+              previous.successMessage != current.successMessage ||
+              previous.createdWorkId != current.createdWorkId,
           listener: (context, state) {
             final error = state.errorMessage;
             if (error != null) AppToast.error(context, error);
@@ -94,6 +96,7 @@ class _WorkCreateViewState extends State<WorkCreateView> {
                         controller: _addressCtr,
                       ),
                       Row(
+                        spacing: AppConstants.space12,
                         children: [
                           Expanded(
                             child: AppDateInput(

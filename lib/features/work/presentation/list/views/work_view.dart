@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:je_fisc/config/router/app_router.dart';
 import 'package:je_fisc/config/router/app_routes.dart';
-import 'package:je_fisc/core/utils/extensions.dart';
-import 'package:je_fisc/shared/widgets/buttons/app_button.dart';
 
 import '../../../../../core/constants/app_constants.dart';
 import '../../../../../shared/widgets/app_status_view.dart';
@@ -51,15 +49,7 @@ class WorkView extends StatelessWidget {
                 spacing: AppConstants.space12,
                 children: [
                   WorkSearchField(initialQuery: state.query),
-                  SizedBox(
-                    width: context.screenWidth * 0.35,
-                    child: AppButton(
-                      size: AppButtonSize.small,
-                      variant: AppButtonVariant.secondary,
-                      label: "Nova Obra",
-                      onPressed: () => appRouter.push(AppRoutes.createWork),
-                    ),
-                  ),
+
                   Expanded(
                     // Keyed by the query: a new search starts a new list from
                     // page 1 instead of appending to the old results.
@@ -73,6 +63,11 @@ class WorkView extends StatelessWidget {
             ),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        icon: const Icon(Icons.add_circle_outline),
+        onPressed: () => appRouter.push(AppRoutes.createWork),
+        label: const Text("Nova Obra"),
       ),
     );
   }

@@ -26,11 +26,11 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const WorkPage(),
       routes: [
         GoRoute(
-          path: AppRoutes.createWork,
+          path: AppRoutes.createWorkSegment,
           builder: (context, state) => const WorkCreatePage(),
         ),
         GoRoute(
-          path: AppRoutes.workDetails,
+          path: AppRoutes.workDetailsSegment,
           builder: (context, state) => WorkDetailPage(
             workId: state.pathParameters["workId"]?.toIntOrNull ?? 0,
           ),

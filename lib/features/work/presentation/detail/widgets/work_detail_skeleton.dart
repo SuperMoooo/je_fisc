@@ -20,12 +20,18 @@ class WorkDetailSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      padding: AppConstants.paddingPage,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: _count,
-      separatorBuilder: (_, _) => const SizedBox(height: AppConstants.space8),
-      itemBuilder: (_, _) => VisitCard(visit: _visit),
+    return Column(
+      spacing: AppConstants.space12,
+      children: [
+        ListView.separated(
+          padding: AppConstants.paddingPage,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: _count,
+          separatorBuilder: (_, _) =>
+              const SizedBox(height: AppConstants.space8),
+          itemBuilder: (_, _) => VisitCard(visit: _visit),
+        ),
+      ],
     );
   }
 }

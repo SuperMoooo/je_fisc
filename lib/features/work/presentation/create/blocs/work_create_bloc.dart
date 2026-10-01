@@ -9,6 +9,10 @@ import 'work_create_state.dart';
 class WorkCreateBloc extends Bloc<WorkCreateEvent, WorkCreateState>
     with ActionBlocMixin<WorkCreateEvent, WorkCreateState> {
   WorkCreateBloc(this._repo) : super(const WorkCreateState()) {
+    // Nothing to load: the empty form is ready as soon as the screen opens.
+    on<WorkCreateStarted>(
+      (event, emit) => emit(state.copyWith(status: AppStatus.success)),
+    );
     on<WorkCreateRequested>(_onCreate, transformer: droppable());
   }
 
