@@ -24,6 +24,7 @@ class WorkState extends Equatable implements StatusState<WorkState> {
     this.successMessage,
     this.query = '',
     this.works = const PagedList(),
+    this.isBackingUp = false,
   });
 
   /// The state the loading skeleton is traced from. The skeleton draws fake
@@ -52,12 +53,16 @@ class WorkState extends Equatable implements StatusState<WorkState> {
   /// is — the next page's key, and whether it is loading or failed.
   final PagedList<WorkModel> works;
 
+  /// A backup is being written — the Backup button shows a spinner.
+  final bool isBackingUp;
+
   WorkState copyWith({
     AppStatus? status,
     String? errorMessage,
     String? successMessage,
     String? query,
     PagedList<WorkModel>? works,
+    bool? isBackingUp,
   }) {
     return WorkState(
       status: status ?? this.status,
@@ -67,6 +72,7 @@ class WorkState extends Equatable implements StatusState<WorkState> {
       successMessage: successMessage,
       query: query ?? this.query,
       works: works ?? this.works,
+      isBackingUp: isBackingUp ?? this.isBackingUp,
     );
   }
 
@@ -81,5 +87,6 @@ class WorkState extends Equatable implements StatusState<WorkState> {
     successMessage,
     query,
     works,
+    isBackingUp,
   ];
 }

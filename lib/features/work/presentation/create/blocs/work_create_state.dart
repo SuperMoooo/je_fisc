@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../../../core/utils/app_status.dart';
+import '../../../domain/models/work_model.dart';
 
 /// Everything the WorkCreate screen draws from, in one place.
 ///
@@ -18,6 +19,8 @@ class WorkCreateState extends Equatable
     this.errorMessage,
     this.successMessage,
     this.createdWorkId,
+    this.work,
+    this.isUpdated = false,
   });
 
   /// The state the loading skeleton is traced from.
@@ -44,13 +47,25 @@ class WorkCreateState extends Equatable
   /// sets it and not on the next one.
   final String? successMessage;
 
+  /// Set once a new work is saved — the view opens it.
   final int? createdWorkId;
+
+  /// The work being edited, as loaded; null when adding one.
+  final WorkModel? work;
+
+  /// Set once an edit is saved — the view pops back. One-shot, like
+  /// [createdWorkId].
+  final bool isUpdated;
+
+  bool get isEditing => work != null;
 
   WorkCreateState copyWith({
     AppStatus? status,
     String? errorMessage,
     String? successMessage,
     int? createdWorkId,
+    WorkModel? work,
+    bool? isUpdated,
   }) {
     return WorkCreateState(
       status: status ?? this.status,
@@ -59,6 +74,8 @@ class WorkCreateState extends Equatable
       errorMessage: errorMessage,
       successMessage: successMessage,
       createdWorkId: createdWorkId,
+      work: work ?? this.work,
+      isUpdated: isUpdated ?? false,
     );
   }
 
@@ -72,5 +89,7 @@ class WorkCreateState extends Equatable
     errorMessage,
     successMessage,
     createdWorkId,
+    work,
+    isUpdated,
   ];
 }

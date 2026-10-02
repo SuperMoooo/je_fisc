@@ -23,6 +23,7 @@ class WorkDetailState extends Equatable
     this.successMessage,
     this.work,
     this.visits = const [],
+    this.isDeleted = false,
   });
 
   /// The state the loading skeleton is traced from.
@@ -74,12 +75,16 @@ class WorkDetailState extends Equatable
   /// The work's visits, newest first, each with its pictures and categories.
   final List<VisitModel> visits;
 
+  /// Set once the work is deleted — the view pops back to the list.
+  final bool isDeleted;
+
   WorkDetailState copyWith({
     AppStatus? status,
     String? errorMessage,
     String? successMessage,
     WorkModel? work,
     List<VisitModel>? visits,
+    bool? isDeleted,
   }) {
     return WorkDetailState(
       status: status ?? this.status,
@@ -89,6 +94,7 @@ class WorkDetailState extends Equatable
       successMessage: successMessage,
       work: work ?? this.work,
       visits: visits ?? this.visits,
+      isDeleted: isDeleted ?? this.isDeleted,
     );
   }
 
@@ -103,5 +109,6 @@ class WorkDetailState extends Equatable
     successMessage,
     work,
     visits,
+    isDeleted,
   ];
 }

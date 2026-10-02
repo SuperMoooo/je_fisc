@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../shared/widgets/app_status_view.dart';
+import '../../../../shared/widgets/buttons/app_button.dart';
+import '../../../../shared/widgets/overlays/app_confirm_dialog.dart';
+import '../../../../shared/widgets/overlays/app_dialogs.dart';
+import '../../domain/models/category_model.dart';
 import '../../../../shared/widgets/overlays/app_toast.dart';
 import '../blocs/category_bloc.dart';
 import '../blocs/category_event.dart';
@@ -18,6 +22,27 @@ class CategoryView extends StatelessWidget {
     final bloc = context.read<CategoryBloc>();
     final name = await CategoryCreateSheet.show();
     if (name != null) bloc.add(CategoryCreated(name));
+  }
+
+  Future<void> _rename(BuildContext context, CategoryModel category) async {
+    final bloc = context.read<CategoryBloc>();
+    final name = await CategoryCreateSheet.show(initialName: category.name);
+    if (name != null && name != category.name) {
+      bloc.add(CategoryRenamed(category, name));
+    }
+  }
+
+  Future<void> _delete(BuildContext context, CategoryModel category) async {
+    final bloc = context.read<CategoryBloc>();
+    final confirmed = await AppConfirmDialog.show(
+      AppDialogs(),
+      title: 'Eliminar categoria?',
+      message: '"${category.name}" será eliminada.',
+      icon: Icons.delete_outline,
+      variant: AppButtonVariant.danger,
+      confirmLabel: 'Eliminar',
+    );
+    if (confirmed) bloc.add(CategoryDeleted(category));
   }
 
   @override
@@ -45,7 +70,11 @@ class CategoryView extends StatelessWidget {
           onRetry: () =>
               context.read<CategoryBloc>().add(const CategoryStarted()),
           skeleton: (context) => const CategorySkeleton(),
-          builder: (context) => CategoryList(categories: state.categories),
+          builder: (context) => CategoryList(
+            categories: state.categories,
+            onEdit: (category) => _rename(context, category),
+            onDelete: (category) => _delete(context, category),
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(

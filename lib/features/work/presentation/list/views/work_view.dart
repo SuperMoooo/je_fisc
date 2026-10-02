@@ -14,6 +14,7 @@ import '../../../../../shared/widgets/overlays/app_toast.dart';
 import '../blocs/work_bloc.dart';
 import '../blocs/work_event.dart';
 import '../blocs/work_state.dart';
+import '../widgets/work_backup_button.dart';
 import '../widgets/work_list_skeleton.dart';
 
 /// The bloc is provided by `WorkPage`, so this only reads it — which is what
@@ -25,9 +26,21 @@ import '../widgets/work_list_skeleton.dart';
 class WorkView extends StatelessWidget {
   const WorkView({super.key});
 
+  /// Pushes [location] and reloads the list once it closes, so a work edited,
+  /// added or deleted over there is up to date here.
+  Future<void> _open(BuildContext context, String location) async {
+    final bloc = context.read<WorkBloc>();
+    await appRouter.push<Object?>(location);
+    if (!bloc.isClosed) bloc.add(const WorkRefreshed());
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Obras'),
+        actions: const [WorkBackupButton()],
+      ),
       body: SafeArea(
         child: BlocConsumer<WorkBloc, WorkState>(
           listenWhen: (previous, current) =>
@@ -84,7 +97,7 @@ class WorkView extends StatelessWidget {
                         itemBuilder: (context, work) => WorkCard(
                           work: work,
                           onTap: () =>
-                              appRouter.push(AppRoutes.workDetailOf(work.id)),
+                              _open(context, AppRoutes.workDetailOf(work.id)),
                         ),
                       ),
                     ),
@@ -97,7 +110,7 @@ class WorkView extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         icon: const Icon(Icons.add_circle_outline),
-        onPressed: () => appRouter.push(AppRoutes.createWork),
+        onPressed: () => _open(context, AppRoutes.createWork),
         label: const Text("Nova Obra"),
       ),
     );

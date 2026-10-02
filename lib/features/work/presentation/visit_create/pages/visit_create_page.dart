@@ -16,9 +16,12 @@ import '../views/visit_create_view.dart';
 /// The picker is resolved here too, so the view stays off the locator and a
 /// widget test can hand it a fake one.
 class VisitCreatePage extends StatelessWidget {
-  const VisitCreatePage({super.key, required this.workId});
+  const VisitCreatePage({super.key, required this.workId, this.visitId});
 
   final int workId;
+
+  /// The visit to edit; null to add one.
+  final int? visitId;
 
   /// JPEG quality the pictures are saved at — plenty to read a crack by,
   /// at a fraction of the camera's file size.
@@ -41,8 +44,14 @@ class VisitCreatePage extends StatelessWidget {
     return BlocProvider(
       // ..add(...) here rather than in the constructor: a bloc that emits
       // during its own construction has no listener yet.
-      create: (_) => getIt<VisitCreateBloc>()..add(const VisitCreateStarted()),
-      child: VisitCreateView(workId: workId, pickPictures: _pickPictures),
+      create: (_) =>
+          getIt<VisitCreateBloc>()
+            ..add(VisitCreateStarted(workId: workId, visitId: visitId)),
+      child: VisitCreateView(
+        workId: workId,
+        visitId: visitId,
+        pickPictures: _pickPictures,
+      ),
     );
   }
 }

@@ -27,10 +27,14 @@ class VisitCreateView extends StatefulWidget {
   const VisitCreateView({
     super.key,
     required this.workId,
+    this.visitId,
     required this.pickPictures,
   });
 
   final int workId;
+
+  /// The visit to edit; null to add one.
+  final int? visitId;
 
   /// Opens the picker for [ImageSource] and resolves to the chosen files'
   /// paths — empty when cancelled or denied.
@@ -51,6 +55,10 @@ class _VisitCreateViewState extends State<VisitCreateView> {
   var _categoryIds = <String>[];
   var _pictures = <AppPickedFile>[];
 
+  /// The edited visit's pictures already saved, by path → id: what is still
+  /// in [_pictures] on save is kept, what is gone is deleted.
+  var _savedPictures = <String, int>{};
+
   @override
   void dispose() {
     _dateCtr.dispose();
@@ -67,12 +75,32 @@ class _VisitCreateViewState extends State<VisitCreateView> {
     ];
   }
 
-  void _create(List<CategoryModel> categories) {
+  /// Starts the form from the visit being edited, once it has loaded.
+  void _fill(VisitModel visit) {
+    setState(() {
+      _dateCtr.text = visit.date.formattedDate;
+      _time = TimeOfDay.fromDateTime(visit.date);
+      _categoryIds = [for (final c in visit.categories) '${c.id}'];
+      _savedPictures = {
+        for (final picture in visit.pictures) picture.picturePath: picture.id,
+      };
+      _pictures = [
+        for (final picture in visit.pictures)
+          AppPickedFile(
+            name: p.basename(picture.picturePath),
+            path: picture.picturePath,
+          ),
+      ];
+    });
+  }
+
+  void _save(List<CategoryModel> categories, VisitModel? editing) {
     if (!_formKey.isValid) return;
+    final kept = {for (final picture in _pictures) picture.path};
     context.read<VisitCreateBloc>().add(
       VisitCreateRequested(
         visit: VisitModel(
-          id: 0,
+          id: editing?.id ?? 0,
           workId: widget.workId,
           date: _time.onDate(_dateCtr.text.toDateTime()!),
           categories: [
@@ -82,7 +110,13 @@ class _VisitCreateViewState extends State<VisitCreateView> {
         ),
         picturePaths: [
           for (final picture in _pictures)
-            if (picture.path != null) picture.path!,
+            if (picture.path != null &&
+                !_savedPictures.containsKey(picture.path))
+              picture.path!,
+        ],
+        removedPictureIds: [
+          for (final MapEntry(key: path, value: id) in _savedPictures.entries)
+            if (!kept.contains(path)) id,
         ],
       ),
     );
@@ -91,13 +125,16 @@ class _VisitCreateViewState extends State<VisitCreateView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Nova Visita")),
+      appBar: AppBar(
+        title: Text(widget.visitId == null ? "Nova Visita" : "Editar Visita"),
+      ),
       body: SafeArea(
         child: BlocConsumer<VisitCreateBloc, VisitCreateState>(
           listenWhen: (previous, current) =>
               previous.errorMessage != current.errorMessage ||
               previous.successMessage != current.successMessage ||
-              previous.createdVisitId != current.createdVisitId,
+              previous.savedVisitId != current.savedVisitId ||
+              previous.visit != current.visit,
           listener: (context, state) {
             final error = state.errorMessage;
             if (error != null) AppToast.error(context, error);
@@ -106,13 +143,23 @@ class _VisitCreateViewState extends State<VisitCreateView> {
             if (success != null) AppToast.success(context, success);
 
             // `true` tells the detail screen to reload its visits.
-            if (state.createdVisitId != null) context.pop(true);
+            if (state.savedVisitId != null) {
+              context.pop(true);
+              return;
+            }
+
+            final visit = state.visit;
+            if (visit != null) _fill(visit);
           },
           builder: (context, state) => AppStatusView(
             status: state.status,
             message: state.errorMessage,
-            onRetry: () =>
-                context.read<VisitCreateBloc>().add(const VisitCreateStarted()),
+            onRetry: () => context.read<VisitCreateBloc>().add(
+              VisitCreateStarted(
+                workId: widget.workId,
+                visitId: widget.visitId,
+              ),
+            ),
             builder: (context) {
               return AppSingleScrollView(
                 child: Form(
@@ -160,9 +207,9 @@ class _VisitCreateViewState extends State<VisitCreateView> {
                       ),
                       AppButton(
                         variant: AppButtonVariant.primary,
-                        label: "Criar Visita",
+                        label: state.isEditing ? "Guardar" : "Criar Visita",
                         isLoading: state.isSubmitting,
-                        onPressed: () => _create(state.categories),
+                        onPressed: () => _save(state.categories, state.visit),
                       ),
                     ],
                   ),

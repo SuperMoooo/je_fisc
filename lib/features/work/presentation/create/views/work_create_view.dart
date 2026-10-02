@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:je_fisc/config/router/app_router.dart';
 import 'package:je_fisc/config/router/app_routes.dart';
 import 'package:je_fisc/core/utils/extensions.dart';
@@ -23,7 +24,10 @@ import '../../../../../shared/widgets/overlays/app_toast.dart';
 /// that succeeds, `WorkList` handles loading, empty and error for the works
 /// themselves, page by page.
 class WorkCreateView extends StatefulWidget {
-  const WorkCreateView({super.key});
+  const WorkCreateView({super.key, this.workId});
+
+  /// The work to edit; null to add one.
+  final int? workId;
 
   @override
   State<WorkCreateView> createState() => _WorkCreateViewState();
@@ -36,12 +40,29 @@ class _WorkCreateViewState extends State<WorkCreateView> {
   final _startDCtr = TextEditingController();
   final _endDCtr = TextEditingController();
 
-  void _create() {
+  @override
+  void dispose() {
+    _clientCtr.dispose();
+    _addressCtr.dispose();
+    _startDCtr.dispose();
+    _endDCtr.dispose();
+    super.dispose();
+  }
+
+  /// Starts the form from the work being edited, once it has loaded.
+  void _fill(WorkModel work) {
+    _clientCtr.text = work.clientName;
+    _addressCtr.text = work.address;
+    _startDCtr.text = work.startDate.formattedDate;
+    _endDCtr.text = work.endDate?.formattedDate ?? '';
+  }
+
+  void _save(WorkModel? editing) {
     if (!_formKey.isValid) return;
     context.read<WorkCreateBloc>().add(
       WorkCreateRequested(
         work: WorkModel(
-          id: 0,
+          id: editing?.id ?? 0,
           clientName: _clientCtr.trimmed,
           address: _addressCtr.trimmed,
           startDate: _startDCtr.text.toDateTime()!,
@@ -54,13 +75,21 @@ class _WorkCreateViewState extends State<WorkCreateView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: BlocSelector<WorkCreateBloc, WorkCreateState, bool>(
+          selector: (state) => state.isEditing,
+          builder: (context, isEditing) =>
+              Text(isEditing ? 'Editar Obra' : 'Nova Obra'),
+        ),
+      ),
       body: SafeArea(
         child: BlocConsumer<WorkCreateBloc, WorkCreateState>(
           listenWhen: (previous, current) =>
               previous.errorMessage != current.errorMessage ||
               previous.successMessage != current.successMessage ||
-              previous.createdWorkId != current.createdWorkId,
+              previous.createdWorkId != current.createdWorkId ||
+              previous.isUpdated != current.isUpdated ||
+              previous.work != current.work,
           listener: (context, state) {
             final error = state.errorMessage;
             if (error != null) AppToast.error(context, error);
@@ -72,12 +101,22 @@ class _WorkCreateViewState extends State<WorkCreateView> {
               appRouter.replace(AppRoutes.workDetailOf(state.createdWorkId!));
               return;
             }
+
+            // `true` tells the detail screen to reload the work.
+            if (state.isUpdated) {
+              context.pop(true);
+              return;
+            }
+
+            final work = state.work;
+            if (work != null) _fill(work);
           },
           builder: (context, state) => AppStatusView(
             status: state.status,
             message: state.errorMessage,
-            onRetry: () =>
-                context.read<WorkCreateBloc>().add(const WorkCreateStarted()),
+            onRetry: () => context.read<WorkCreateBloc>().add(
+              WorkCreateStarted(workId: widget.workId),
+            ),
             builder: (context) {
               return AppSingleScrollView(
                 child: Form(
@@ -115,8 +154,8 @@ class _WorkCreateViewState extends State<WorkCreateView> {
                       ),
                       AppButton(
                         variant: AppButtonVariant.primary,
-                        label: "Criar Obra",
-                        onPressed: _create,
+                        label: state.isEditing ? "Guardar" : "Criar Obra",
+                        onPressed: () => _save(state.work),
                       ),
                     ],
                   ),

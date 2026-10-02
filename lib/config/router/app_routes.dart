@@ -24,10 +24,16 @@ abstract final class AppRoutes {
   static String workDetailOf(int id) => '/work/$id';
   static String createVisitOf(int workId) =>
       '${workDetailOf(workId)}/$createVisitSegment';
+  static String editWorkOf(int workId) =>
+      '${workDetailOf(workId)}/$editWorkSegment';
+  static String editVisitOf(int workId, int visitId) =>
+      '${workDetailOf(workId)}/visits/$visitId/edit';
 
   // Child segment of [workDetail] — GoRouter joins a nested route's path
   // onto its parent's.
   static const createVisitSegment = 'visits/create';
+  static const editWorkSegment = 'edit';
+  static const editVisitSegment = 'visits/:visitId/edit';
   // moarch:routes
 
   // Dynamic routes: the constant holds the pattern GoRouter matches on, the

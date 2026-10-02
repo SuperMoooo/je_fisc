@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:bloc_concurrency/bloc_concurrency.dart';
 
 import '../../../../../core/utils/app_status.dart';
 import '../../../domain/repositories/work_repository.dart';
@@ -9,19 +10,8 @@ class WorkDetailBloc extends Bloc<WorkDetailEvent, WorkDetailState>
     with ActionBlocMixin<WorkDetailEvent, WorkDetailState> {
   WorkDetailBloc(this._repo) : super(const WorkDetailState()) {
     on<WorkDetailStarted>(_onStarted);
-
-    // TODO: one handler per action, e.g.
-    // on<WorkDetailDeleted>(_onDeleted, transformer: droppable());
-    // `transformer:` is how events queue before the handler sees them —
-    // droppable, restartable, sequential, concurrent, from bloc_concurrency.
-    // Wrap each handler's body in runAction (from ActionBlocMixin), which
-    // handles loading and AppException for you:
-    //
-    // Future<void> _onDeleted(WorkDetailDeleted event, Emitter<WorkDetailState> emit) =>
-    //     runAction(emit, (current) async {
-    //       await _repo.delete(event.id);
-    //       return current.copyWith(successMessage: 'Deleted');
-    //     });
+    on<WorkDetailDeleted>(_onDeleted, transformer: droppable());
+    on<WorkDetailVisitDeleted>(_onVisitDeleted, transformer: droppable());
   }
 
   final WorkRepository _repo;
@@ -39,6 +29,31 @@ class WorkDetailBloc extends Bloc<WorkDetailEvent, WorkDetailState>
       status: AppStatus.success,
       work: work,
       visits: visits,
+    );
+  });
+
+  /// The view pops back to the list on [WorkDetailState.isDeleted].
+  Future<void> _onDeleted(
+    WorkDetailDeleted event,
+    Emitter<WorkDetailState> emit,
+  ) => runAction(emit, (current) async {
+    final work = current.work;
+    if (work == null) return current;
+    await _repo.deleteWork(work.id);
+    return current.copyWith(isDeleted: true);
+  });
+
+  Future<void> _onVisitDeleted(
+    WorkDetailVisitDeleted event,
+    Emitter<WorkDetailState> emit,
+  ) => runAction(emit, (current) async {
+    await _repo.deleteVisit(event.visitId);
+    return current.copyWith(
+      visits: [
+        for (final visit in current.visits)
+          if (visit.id != event.visitId) visit,
+      ],
+      successMessage: 'Visita eliminada',
     );
   });
 }

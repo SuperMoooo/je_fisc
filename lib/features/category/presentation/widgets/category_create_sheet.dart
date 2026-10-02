@@ -7,14 +7,19 @@ import 'package:je_fisc/shared/widgets/inputs/app_input.dart';
 import 'package:je_fisc/shared/widgets/overlays/app_bottom_modals.dart';
 import 'package:je_fisc/shared/widgets/overlays/app_bottom_sheet_scaffold.dart';
 
-/// Asks for a new category's name. Pops the trimmed name, or null when
+/// Asks for a category's name — a new one, or a new name for an existing one
+/// when [initialName] is given. Pops the trimmed name, or null when
 /// dismissed — saving it is the caller's bloc's job, so the sheet needs none.
 class CategoryCreateSheet extends StatefulWidget {
-  const CategoryCreateSheet({super.key});
+  const CategoryCreateSheet({super.key, this.initialName});
 
-  static Future<String?> show() => AppBottomModals().showAppBottomModal<String>(
-    child: const CategoryCreateSheet(),
-  );
+  /// The name being edited; null to add a category.
+  final String? initialName;
+
+  static Future<String?> show({String? initialName}) =>
+      AppBottomModals().showAppBottomModal<String>(
+        child: CategoryCreateSheet(initialName: initialName),
+      );
 
   @override
   State<CategoryCreateSheet> createState() => _CategoryCreateSheetState();
@@ -22,7 +27,9 @@ class CategoryCreateSheet extends StatefulWidget {
 
 class _CategoryCreateSheetState extends State<CategoryCreateSheet> {
   final _formKey = GlobalKey<FormState>();
-  final _nameCtr = TextEditingController();
+  late final _nameCtr = TextEditingController(text: widget.initialName);
+
+  bool get _isEditing => widget.initialName != null;
 
   @override
   void dispose() {
@@ -41,7 +48,7 @@ class _CategoryCreateSheetState extends State<CategoryCreateSheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
       child: AppBottomSheetScaffold(
-        title: 'Nova Categoria',
+        title: _isEditing ? 'Editar Categoria' : 'Nova Categoria',
         child: Form(
           key: _formKey,
           child: Column(
@@ -59,7 +66,7 @@ class _CategoryCreateSheetState extends State<CategoryCreateSheet> {
               ),
               AppButton(
                 variant: AppButtonVariant.primary,
-                label: 'Adicionar',
+                label: _isEditing ? 'Guardar' : 'Adicionar',
                 onPressed: _submit,
               ),
             ],

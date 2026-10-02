@@ -80,6 +80,19 @@ final GoRouter appRouter = GoRouter(
             workId: state.pathParameters["workId"]?.toIntOrNull ?? 0,
           ),
         ),
+        GoRoute(
+          path: AppRoutes.editVisitSegment,
+          builder: (context, state) => VisitCreatePage(
+            workId: state.pathParameters["workId"]?.toIntOrNull ?? 0,
+            visitId: state.pathParameters["visitId"]?.toIntOrNull,
+          ),
+        ),
+        GoRoute(
+          path: AppRoutes.editWorkSegment,
+          builder: (context, state) => WorkCreatePage(
+            workId: state.pathParameters["workId"]?.toIntOrNull,
+          ),
+        ),
       ],
     ),
     // moarch:routes

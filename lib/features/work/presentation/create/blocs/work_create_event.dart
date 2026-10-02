@@ -10,14 +10,23 @@ sealed class WorkCreateEvent extends Equatable {
   List<Object?> get props => const [];
 }
 
-/// Loads the screen. Dispatched when it opens, and again to refresh or retry.
+/// Loads the screen. Dispatched when it opens, and again to retry. With a
+/// [workId] the form edits that work, and loads it first; without one it
+/// adds a new work.
 final class WorkCreateStarted extends WorkCreateEvent {
-  const WorkCreateStarted();
+  const WorkCreateStarted({this.workId});
+
+  final int? workId;
+
+  @override
+  List<Object?> get props => [workId];
 }
 
+/// Saves [work]: adds it when its id is 0, updates it otherwise.
 final class WorkCreateRequested extends WorkCreateEvent {
   const WorkCreateRequested({required this.work});
   final WorkModel work;
-}
 
-// TODO: one event per action the screen can take.
+  @override
+  List<Object?> get props => [work];
+}

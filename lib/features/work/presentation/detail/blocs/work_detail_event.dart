@@ -14,6 +14,22 @@ final class WorkDetailStarted extends WorkDetailEvent {
   const WorkDetailStarted({required this.workId});
 
   final int workId;
+
+  @override
+  List<Object?> get props => [workId];
 }
 
-// TODO: one event per action the screen can take.
+/// Deletes the work on screen, with its visits and their pictures.
+final class WorkDetailDeleted extends WorkDetailEvent {
+  const WorkDetailDeleted();
+}
+
+/// Deletes one of the work's visits, with its pictures.
+final class WorkDetailVisitDeleted extends WorkDetailEvent {
+  const WorkDetailVisitDeleted(this.visitId);
+
+  final int visitId;
+
+  @override
+  List<Object?> get props => [visitId];
+}

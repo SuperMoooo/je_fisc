@@ -71,6 +71,65 @@ void main() {
       );
     });
 
+    test('a category renamed keeps its id; a name already taken is '
+        'refused', () async {
+      final all = await categories.fetchCategories();
+      final jardim = all.firstWhere((c) => c.name == 'Jardim');
+
+      await categories.updateCategory(jardim.copyWith(name: ' Jardins '));
+      final renamed = await categories.fetchCategories();
+      expect(renamed, contains(CategoryModel(id: jardim.id, name: 'Jardins')));
+
+      expect(
+        () => categories.updateCategory(jardim.copyWith(name: 'fundações')),
+        throwsA(
+          isA<StorageException>().having(
+            (e) => e.message,
+            'message',
+            contains('já existe'),
+          ),
+        ),
+      );
+    });
+
+    test('a category no visit uses is deleted; one a visit uses is '
+        'refused with a message saying so', () async {
+      final all = await categories.fetchCategories();
+      final jardim = all.firstWhere((c) => c.name == 'Jardim');
+      final outros = all.firstWhere((c) => c.name == 'Outros');
+
+      final work = await works.createWork(
+        WorkModel(
+          id: 0,
+          clientName: 'Cliente',
+          address: 'Rua',
+          startDate: DateTime(2026, 9),
+        ),
+      );
+      await works.createVisit(
+        VisitModel(
+          id: 0,
+          workId: work.id,
+          date: DateTime(2026, 9, 10),
+          categories: [jardim],
+        ),
+      );
+
+      await categories.deleteCategory(outros.id);
+      expect(await categories.fetchCategories(), isNot(contains(outros)));
+
+      expect(
+        () => categories.deleteCategory(jardim.id),
+        throwsA(
+          isA<StorageException>().having(
+            (e) => e.message,
+            'message',
+            contains('a ser usada'),
+          ),
+        ),
+      );
+    });
+
     test("a visit's categories come back with it, by name", () async {
       final all = await categories.fetchCategories();
       final jardim = all.firstWhere((c) => c.name == 'Jardim');

@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:je_fisc/config/router/app_router.dart';
 import 'package:je_fisc/config/router/app_routes.dart';
 import 'package:je_fisc/core/utils/extensions.dart';
 import 'package:je_fisc/features/work/presentation/detail/blocs/work_detail_bloc.dart';
 import 'package:je_fisc/features/work/presentation/detail/blocs/work_detail_event.dart';
 import 'package:je_fisc/features/work/presentation/detail/blocs/work_detail_state.dart';
+import 'package:je_fisc/features/work/domain/models/visit_model.dart';
 import 'package:je_fisc/features/work/presentation/detail/widgets/visit_card.dart';
+import 'package:je_fisc/features/work/presentation/detail/widgets/work_detail_actions.dart';
+import 'package:je_fisc/shared/widgets/overlays/app_confirm_dialog.dart';
+import 'package:je_fisc/shared/widgets/overlays/app_dialogs.dart';
 import 'package:je_fisc/features/work/presentation/detail/widgets/work_detail_skeleton.dart';
 import 'package:je_fisc/shared/widgets/buttons/app_button.dart';
 import 'package:je_fisc/shared/widgets/empty_view.dart';
@@ -27,17 +32,51 @@ import '../../../../../shared/widgets/overlays/app_toast.dart';
 class WorkDetailView extends StatelessWidget {
   const WorkDetailView({super.key});
 
+  Future<void> _editVisit(BuildContext context, VisitModel visit) async {
+    final bloc = context.read<WorkDetailBloc>();
+    final saved = await appRouter.push<bool>(
+      AppRoutes.editVisitOf(visit.workId, visit.id),
+    );
+    if (saved == true) bloc.add(WorkDetailStarted(workId: visit.workId));
+  }
+
+  Future<void> _deleteVisit(BuildContext context, VisitModel visit) async {
+    final bloc = context.read<WorkDetailBloc>();
+    final confirmed = await AppConfirmDialog.show(
+      AppDialogs(),
+      title: 'Eliminar visita?',
+      message:
+          'A visita de ${visit.date.formattedDate} e as suas fotografias '
+          'serão eliminadas.',
+      icon: Icons.delete_outline,
+      variant: AppButtonVariant.danger,
+      confirmLabel: 'Eliminar',
+    );
+    if (confirmed) bloc.add(WorkDetailVisitDeleted(visit.id));
+  }
+
   @override
   Widget build(BuildContext context) {
     final textTheme = context.textTheme;
     return Scaffold(
-      appBar: AppBar(title: const Text("Detalhes da Obra")),
+      appBar: AppBar(
+        title: const Text("Detalhes da Obra"),
+        actions: const [WorkDetailActions()],
+      ),
       body: SafeArea(
         child: BlocConsumer<WorkDetailBloc, WorkDetailState>(
           listenWhen: (previous, current) =>
               previous.errorMessage != current.errorMessage ||
-              previous.successMessage != current.successMessage,
+              previous.successMessage != current.successMessage ||
+              previous.isDeleted != current.isDeleted,
           listener: (context, state) {
+            // `true` tells the works list to reload.
+            if (state.isDeleted) {
+              AppToast.success(context, 'Obra eliminada');
+              context.pop(true);
+              return;
+            }
+
             final error = state.errorMessage;
             if (error != null) AppToast.error(context, error);
 
@@ -133,7 +172,12 @@ class WorkDetailView extends StatelessWidget {
                         icon: Icons.event_busy_outlined,
                       )
                     else
-                      for (final visit in visits) VisitCard(visit: visit),
+                      for (final visit in visits)
+                        VisitCard(
+                          visit: visit,
+                          onEdit: () => _editVisit(context, visit),
+                          onDelete: () => _deleteVisit(context, visit),
+                        ),
                   ],
                 ),
               );

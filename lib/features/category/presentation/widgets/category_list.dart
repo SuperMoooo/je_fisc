@@ -2,14 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:je_fisc/core/constants/app_constants.dart';
 import 'package:je_fisc/features/category/domain/models/category_model.dart';
 import 'package:je_fisc/shared/widgets/cards/app_card.dart';
+import 'package:je_fisc/shared/widgets/buttons/edit_delete_actions.dart';
 import 'package:je_fisc/shared/widgets/lists/app_list_tile.dart';
 
 /// The categories as one card of rows. Shared by the view and its skeleton,
 /// so the shimmer has the shape of what loads.
 class CategoryList extends StatelessWidget {
-  const CategoryList({super.key, required this.categories});
+  const CategoryList({
+    super.key,
+    required this.categories,
+    this.onEdit,
+    this.onDelete,
+  });
 
   final List<CategoryModel> categories;
+
+  /// Each row's edit and delete buttons. Null hides them (the skeleton).
+  final ValueChanged<CategoryModel>? onEdit;
+  final ValueChanged<CategoryModel>? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +35,16 @@ class CategoryList extends StatelessWidget {
                 AppListTile(
                   leading: const Icon(Icons.label_outline),
                   title: categories[i].name,
+                  trailing: onEdit == null && onDelete == null
+                      ? null
+                      : EditDeleteActions(
+                          onEdit: onEdit == null
+                              ? null
+                              : () => onEdit!(categories[i]),
+                          onDelete: onDelete == null
+                              ? null
+                              : () => onDelete!(categories[i]),
+                        ),
                 ),
               ],
             ],

@@ -35,4 +35,36 @@ class CategoryLocalDataSource {
       throw StorageException(message: 'A categoria "$trimmed" já existe.');
     }
   });
+
+  /// Renames [category] to its `name`, trimmed. Visits tagged with it follow,
+  /// since they point at its id.
+  Future<void> updateCategory(CategoryModel category) => safeDbCall(() async {
+    final trimmed = category.name.trim();
+    try {
+      await _db.update(
+        Tables.categories,
+        {'name': trimmed},
+        where: 'id = ?',
+        whereArgs: [category.id],
+      );
+    } on DatabaseException catch (e) {
+      if (!e.isUniqueConstraintError()) rethrow;
+      throw StorageException(message: 'A categoria "$trimmed" já existe.');
+    }
+  });
+
+  /// Deletes the category. One some visit is tagged with is refused
+  /// (ON DELETE RESTRICT), with a message saying so.
+  Future<void> deleteCategory(int id) => safeDbCall(() async {
+    try {
+      await _db.delete(Tables.categories, where: 'id = ?', whereArgs: [id]);
+    } on DatabaseException catch (e) {
+      if (!e.toString().contains('FOREIGN KEY constraint failed')) rethrow;
+      throw const StorageException(
+        message:
+            'Esta categoria está a ser usada em visitas e não pode ser '
+            'eliminada.',
+      );
+    }
+  });
 }

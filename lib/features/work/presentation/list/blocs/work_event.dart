@@ -39,3 +39,8 @@ final class WorkSearchChanged extends WorkEvent {
 final class WorkMoreRequested extends WorkEvent {
   const WorkMoreRequested();
 }
+
+/// The Backup button: save a copy of the whole database where the user picks.
+final class WorkBackupRequested extends WorkEvent {
+  const WorkBackupRequested();
+}

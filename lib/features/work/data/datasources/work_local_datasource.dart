@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'package:je_fisc/core/database/app_database.dart';
@@ -270,6 +273,27 @@ class WorkLocalDataSource {
     );
     await _db.delete(Tables.visitPictures, where: 'id = ?', whereArgs: [id]);
     await _files.delete(rows.map((r) => r['picture_path']! as String));
+  });
+
+  // ── Backup ───────────────────────────────────────────────────
+
+  /// Asks the user where to save a copy of the whole database file — every
+  /// table, every row — and writes it there. False when the dialog was
+  /// dismissed.
+  ///
+  /// The picture files are not in it: the rows hold only their paths.
+  Future<bool> exportBackup() => safeDbCall(() async {
+    // Folds a write-ahead log back into the file first, so the bytes read
+    // below hold every committed write. A no-op when the log is off.
+    await _db.rawQuery('PRAGMA wal_checkpoint(TRUNCATE)');
+    final bytes = await File(_db.path).readAsBytes();
+    final stamp = DateTime.now().format('yyyyMMdd_HHmm');
+    final saved = await FilePicker.saveFile(
+      dialogTitle: 'Guardar cópia de segurança',
+      fileName: 'je_fisc_backup_$stamp.db',
+      bytes: bytes,
+    );
+    return saved != null;
   });
 
   // ── Helpers ──────────────────────────────────────────────────

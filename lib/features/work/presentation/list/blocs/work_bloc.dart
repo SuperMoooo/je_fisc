@@ -20,6 +20,8 @@ class WorkBloc extends Bloc<WorkEvent, WorkState>
     // so only the last one, once typing pauses, becomes the query.
     on<WorkSearchChanged>(_onSearchChanged, transformer: restartable());
     on<WorkMoreRequested>((event, emit) => loadMore(emit));
+    // droppable: a second tap while the save dialog is open does nothing.
+    on<WorkBackupRequested>(_onBackupRequested, transformer: droppable());
   }
 
   final WorkRepository _repo;
@@ -56,6 +58,23 @@ class WorkBloc extends Bloc<WorkEvent, WorkState>
     final first = await _repo.searchWorks(query: query);
     return current.copyWith(query: query, works: PagedList.first(first));
   });
+
+  /// The spinner goes up before the save dialog and comes down whatever
+  /// happens — a failure keeps the list and shows a toast (runAction).
+  Future<void> _onBackupRequested(
+    WorkBackupRequested event,
+    Emitter<WorkState> emit,
+  ) async {
+    emit(state.copyWith(isBackingUp: true));
+    await runAction(emit, (current) async {
+      final saved = await _repo.exportBackup();
+      return current.copyWith(
+        isBackingUp: false,
+        successMessage: saved ? 'Cópia de segurança guardada' : null,
+      );
+    });
+    if (state.isBackingUp) emit(state.copyWith(isBackingUp: false));
+  }
 
   @override
   Future<Paginated<WorkModel>> fetchPage(Object? next) =>

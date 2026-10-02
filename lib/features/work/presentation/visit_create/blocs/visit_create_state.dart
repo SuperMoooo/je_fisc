@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 
 import '../../../../../core/utils/app_status.dart';
 import '../../../../category/domain/models/category_model.dart';
+import '../../../domain/models/visit_model.dart';
 
 /// Everything the VisitCreate screen draws from, in one place.
 ///
@@ -14,9 +15,10 @@ class VisitCreateState extends Equatable
     this.status = AppStatus.initial,
     this.errorMessage,
     this.successMessage,
-    this.createdVisitId,
+    this.savedVisitId,
     this.isSubmitting = false,
     this.categories = const [],
+    this.visit,
   });
 
   /// The state the loading skeleton is traced from.
@@ -34,7 +36,7 @@ class VisitCreateState extends Equatable
   final String? successMessage;
 
   /// Set once the visit is saved — the view pops back to the work on it.
-  final int? createdVisitId;
+  final int? savedVisitId;
 
   /// A save is in flight — the button spins. Dropped by [copyWith] like the
   /// messages, so whatever `runAction` emits next, success or failure, ends
@@ -44,13 +46,19 @@ class VisitCreateState extends Equatable
   /// Every category, alphabetically — what the form picks from.
   final List<CategoryModel> categories;
 
+  /// The visit being edited, as loaded; null when adding one.
+  final VisitModel? visit;
+
+  bool get isEditing => visit != null;
+
   VisitCreateState copyWith({
     AppStatus? status,
     String? errorMessage,
     String? successMessage,
-    int? createdVisitId,
+    int? savedVisitId,
     bool? isSubmitting,
     List<CategoryModel>? categories,
+    VisitModel? visit,
   }) {
     return VisitCreateState(
       status: status ?? this.status,
@@ -58,9 +66,10 @@ class VisitCreateState extends Equatable
       // passed here is a message already shown.
       errorMessage: errorMessage,
       successMessage: successMessage,
-      createdVisitId: createdVisitId,
+      savedVisitId: savedVisitId,
       isSubmitting: isSubmitting ?? false,
       categories: categories ?? this.categories,
+      visit: visit ?? this.visit,
     );
   }
 
@@ -73,8 +82,9 @@ class VisitCreateState extends Equatable
     status,
     errorMessage,
     successMessage,
-    createdVisitId,
+    savedVisitId,
     isSubmitting,
     categories,
+    visit,
   ];
 }

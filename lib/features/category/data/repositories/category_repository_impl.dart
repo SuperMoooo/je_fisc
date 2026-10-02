@@ -13,4 +13,11 @@ class CategoryRepositoryImpl implements CategoryRepository {
   @override
   Future<CategoryModel> createCategory(String name) =>
       _local.createCategory(name);
+
+  @override
+  Future<void> updateCategory(CategoryModel category) =>
+      _local.updateCategory(category);
+
+  @override
+  Future<void> deleteCategory(int id) => _local.deleteCategory(id);
 }

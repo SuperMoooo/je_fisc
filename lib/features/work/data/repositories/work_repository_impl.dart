@@ -55,4 +55,9 @@ class WorkRepositoryImpl implements WorkRepository {
 
   @override
   Future<void> deleteVisitPicture(int id) => _local.deleteVisitPicture(id);
+
+  // ── Backup ───────────────────────────────────────────────────
+
+  @override
+  Future<bool> exportBackup() => _local.exportBackup();
 }

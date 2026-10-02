@@ -43,4 +43,10 @@ abstract interface class WorkRepository {
   /// is fine to pass.
   Future<VisitPictureModel> addVisitPicture(int visitId, String sourcePath);
   Future<void> deleteVisitPicture(int id);
+
+  // Backup
+
+  /// Lets the user save a copy of the whole database on the device. False
+  /// when they dismissed the save dialog. Picture files are not included.
+  Future<bool> exportBackup();
 }
