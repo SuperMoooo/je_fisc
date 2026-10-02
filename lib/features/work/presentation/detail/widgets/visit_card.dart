@@ -4,6 +4,7 @@ import 'package:je_fisc/core/utils/extensions.dart';
 import 'package:je_fisc/features/work/domain/models/visit_model.dart';
 import 'package:je_fisc/features/work/presentation/detail/widgets/visit_categories.dart';
 import 'package:je_fisc/features/work/presentation/detail/widgets/visit_detail_sheet.dart';
+import 'package:je_fisc/features/work/presentation/detail/widgets/visit_notes.dart';
 import 'package:je_fisc/features/work/presentation/detail/widgets/visit_picture.dart';
 import 'package:je_fisc/shared/widgets/buttons/app_button.dart';
 import 'package:je_fisc/shared/widgets/buttons/edit_delete_actions.dart';
@@ -21,6 +22,9 @@ class VisitCard extends StatelessWidget {
   final VoidCallback? onDelete;
 
   static const _pictureAspectRatio = 16 / 9;
+
+  /// How much of the notes the card shows; the sheet has the rest.
+  static const _notesPreviewLines = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +77,8 @@ class VisitCard extends StatelessWidget {
                   ],
                 ),
                 VisitCategories(categories: visit.categories),
+                if (visit.notes case final notes?)
+                  VisitNotes(notes: notes, maxLines: _notesPreviewLines),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   spacing: AppConstants.space8,

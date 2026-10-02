@@ -1,4 +1,5 @@
 import '../../../../core/network/paginated.dart';
+import '../models/backup_import.dart';
 import '../models/visit_model.dart';
 import '../models/visit_picture_model.dart';
 import '../models/work_model.dart';
@@ -49,4 +50,16 @@ abstract interface class WorkRepository {
   /// Lets the user save a copy of the whole database on the device. False
   /// when they dismissed the save dialog. Picture files are not included.
   Future<bool> exportBackup();
+
+  /// Lets the user pick a backup [exportBackup] wrote and adds what it holds
+  /// that is not here yet — nothing here is changed or removed. Null when
+  /// they dismissed the dialog.
+  Future<BackupImport?> importBackup();
+
+  // Report
+
+  /// Builds a PDF of the work and every visit — date, categories, notes and
+  /// pictures — and lets the user save it. False when they dismissed the
+  /// save dialog.
+  Future<bool> exportVisitsReport(int workId);
 }

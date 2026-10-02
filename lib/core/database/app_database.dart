@@ -130,6 +130,11 @@ abstract final class AppDatabase {
         'ON ${Tables.visitCategories}(category_id)',
       );
     },
+
+    // v3 — free-text notes on a visit, optional.
+    (txn) async {
+      await txn.execute('ALTER TABLE ${Tables.visits} ADD COLUMN notes TEXT');
+    },
   ];
 
   /// What the categories table starts with. Seeded once, by the v2
@@ -158,8 +163,12 @@ abstract final class AppDatabase {
 
   static int get _version => _migrations.length;
 
-  static Future<Database> open() async {
-    final path = p.join(await getDatabasesPath(), fileName);
+  static Future<Database> open() async =>
+      openAt(p.join(await getDatabasesPath(), fileName));
+
+  /// Opens the database file at [path] — the app's own, or a backup copy —
+  /// and migrates it to the current schema, so either is read the same way.
+  static Future<Database> openAt(String path) {
     return openDatabase(
       path,
       version: _version,

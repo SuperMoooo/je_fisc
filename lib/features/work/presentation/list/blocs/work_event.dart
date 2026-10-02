@@ -44,3 +44,9 @@ final class WorkMoreRequested extends WorkEvent {
 final class WorkBackupRequested extends WorkEvent {
   const WorkBackupRequested();
 }
+
+/// The Backup menu's import: pick a backup and add what it holds that is not
+/// here yet, then reload the list.
+final class WorkBackupImportRequested extends WorkEvent {
+  const WorkBackupImportRequested();
+}

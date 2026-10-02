@@ -3,13 +3,15 @@ import 'package:je_fisc/core/constants/app_constants.dart';
 import 'package:je_fisc/core/utils/extensions.dart';
 import 'package:je_fisc/features/work/domain/models/visit_model.dart';
 import 'package:je_fisc/features/work/presentation/detail/widgets/visit_categories.dart';
+import 'package:je_fisc/features/work/presentation/detail/widgets/visit_notes.dart';
 import 'package:je_fisc/features/work/presentation/detail/widgets/visit_picture.dart';
 import 'package:je_fisc/features/work/presentation/detail/widgets/visit_picture_viewer.dart';
 import 'package:je_fisc/shared/widgets/empty_view.dart';
 import 'package:je_fisc/shared/widgets/overlays/app_bottom_modals.dart';
 import 'package:je_fisc/shared/widgets/overlays/app_bottom_sheet_scaffold.dart';
 
-/// Everything about one visit: its date, every category and every picture.
+/// Everything about one visit: its date, every category, its notes and every
+/// picture.
 ///
 /// Draws the [VisitModel] it is handed and nothing else, so it needs no bloc.
 class VisitDetailSheet extends StatelessWidget {
@@ -40,6 +42,7 @@ class VisitDetailSheet extends StatelessWidget {
             spacing: AppConstants.space16,
             children: [
               VisitCategories(categories: visit.categories),
+              if (visit.notes case final notes?) VisitNotes(notes: notes),
               if (visit.pictures.isEmpty)
                 const EmptyView(
                   title: 'Sem fotografias',

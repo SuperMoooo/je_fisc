@@ -24,6 +24,11 @@ final class WorkDetailDeleted extends WorkDetailEvent {
   const WorkDetailDeleted();
 }
 
+/// Builds the PDF report of the work's visits and asks where to save it.
+final class WorkDetailReportRequested extends WorkDetailEvent {
+  const WorkDetailReportRequested();
+}
+
 /// Deletes one of the work's visits, with its pictures.
 final class WorkDetailVisitDeleted extends WorkDetailEvent {
   const WorkDetailVisitDeleted(this.visitId);

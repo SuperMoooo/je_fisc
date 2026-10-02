@@ -24,6 +24,7 @@ class WorkDetailState extends Equatable
     this.work,
     this.visits = const [],
     this.isDeleted = false,
+    this.isExportingReport = false,
   });
 
   /// The state the loading skeleton is traced from.
@@ -47,6 +48,7 @@ class WorkDetailState extends Equatable
           id: i,
           workId: 0,
           date: DateTime(2000),
+          notes: BoneMock.words(6),
           categories: [
             CategoryModel(id: 0, name: BoneMock.words(1)),
             CategoryModel(id: 1, name: BoneMock.words(2)),
@@ -78,6 +80,9 @@ class WorkDetailState extends Equatable
   /// Set once the work is deleted — the view pops back to the list.
   final bool isDeleted;
 
+  /// The PDF report is being built — its button shows a spinner.
+  final bool isExportingReport;
+
   WorkDetailState copyWith({
     AppStatus? status,
     String? errorMessage,
@@ -85,6 +90,7 @@ class WorkDetailState extends Equatable
     WorkModel? work,
     List<VisitModel>? visits,
     bool? isDeleted,
+    bool? isExportingReport,
   }) {
     return WorkDetailState(
       status: status ?? this.status,
@@ -95,6 +101,7 @@ class WorkDetailState extends Equatable
       work: work ?? this.work,
       visits: visits ?? this.visits,
       isDeleted: isDeleted ?? this.isDeleted,
+      isExportingReport: isExportingReport ?? this.isExportingReport,
     );
   }
 
@@ -110,5 +117,6 @@ class WorkDetailState extends Equatable
     work,
     visits,
     isDeleted,
+    isExportingReport,
   ];
 }

@@ -12,6 +12,8 @@ class WorkDetailBloc extends Bloc<WorkDetailEvent, WorkDetailState>
     on<WorkDetailStarted>(_onStarted);
     on<WorkDetailDeleted>(_onDeleted, transformer: droppable());
     on<WorkDetailVisitDeleted>(_onVisitDeleted, transformer: droppable());
+    // droppable: a second tap while the report is built does nothing.
+    on<WorkDetailReportRequested>(_onReportRequested, transformer: droppable());
   }
 
   final WorkRepository _repo;
@@ -42,6 +44,27 @@ class WorkDetailBloc extends Bloc<WorkDetailEvent, WorkDetailState>
     await _repo.deleteWork(work.id);
     return current.copyWith(isDeleted: true);
   });
+
+  /// The spinner goes up before the report is built and comes down whatever
+  /// happens — a failure keeps the screen and shows a toast (runAction).
+  Future<void> _onReportRequested(
+    WorkDetailReportRequested event,
+    Emitter<WorkDetailState> emit,
+  ) async {
+    final work = state.work;
+    if (work == null) return;
+    emit(state.copyWith(isExportingReport: true));
+    await runAction(emit, (current) async {
+      final saved = await _repo.exportVisitsReport(work.id);
+      return current.copyWith(
+        isExportingReport: false,
+        successMessage: saved ? 'Relatório PDF guardado' : null,
+      );
+    });
+    if (state.isExportingReport) {
+      emit(state.copyWith(isExportingReport: false));
+    }
+  }
 
   Future<void> _onVisitDeleted(
     WorkDetailVisitDeleted event,

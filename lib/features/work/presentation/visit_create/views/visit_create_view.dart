@@ -12,6 +12,7 @@ import 'package:je_fisc/shared/widgets/buttons/app_button.dart';
 import 'package:je_fisc/shared/widgets/inputs/app_date_input.dart';
 import 'package:je_fisc/features/category/domain/models/category_model.dart';
 import 'package:je_fisc/shared/widgets/inputs/app_file_picker_field.dart';
+import 'package:je_fisc/shared/widgets/inputs/app_input.dart';
 import 'package:je_fisc/shared/widgets/inputs/app_multi_select_input.dart';
 import 'package:je_fisc/shared/widgets/inputs/app_time_input.dart';
 import 'package:je_fisc/shared/widgets/layouts/app_single_scroll_view.dart';
@@ -47,9 +48,15 @@ class VisitCreateView extends StatefulWidget {
 class _VisitCreateViewState extends State<VisitCreateView> {
   final _formKey = GlobalKey<FormState>();
   final _dateCtr = TextEditingController(text: DateTime.now().formattedDate);
+  final _notesCtr = TextEditingController();
 
   /// When on the day the visit was. Starts at now, like the date.
   var _time = TimeOfDay.now();
+
+  /// The notes box starts this tall and grows to [_notesMaxLines] before it
+  /// scrolls.
+  static const _notesMinLines = 3;
+  static const _notesMaxLines = 8;
 
   /// Ids of the ticked categories, as [AppMultiSelectInput] keys them.
   var _categoryIds = <String>[];
@@ -62,6 +69,7 @@ class _VisitCreateViewState extends State<VisitCreateView> {
   @override
   void dispose() {
     _dateCtr.dispose();
+    _notesCtr.dispose();
     super.dispose();
   }
 
@@ -80,6 +88,7 @@ class _VisitCreateViewState extends State<VisitCreateView> {
     setState(() {
       _dateCtr.text = visit.date.formattedDate;
       _time = TimeOfDay.fromDateTime(visit.date);
+      _notesCtr.text = visit.notes ?? '';
       _categoryIds = [for (final c in visit.categories) '${c.id}'];
       _savedPictures = {
         for (final picture in visit.pictures) picture.picturePath: picture.id,
@@ -103,6 +112,7 @@ class _VisitCreateViewState extends State<VisitCreateView> {
           id: editing?.id ?? 0,
           workId: widget.workId,
           date: _time.onDate(_dateCtr.text.toDateTime()!),
+          notes: _notesCtr.text.trim().isEmpty ? null : _notesCtr.text.trim(),
           categories: [
             for (final category in categories)
               if (_categoryIds.contains('${category.id}')) category,
@@ -197,6 +207,16 @@ class _VisitCreateViewState extends State<VisitCreateView> {
                         labelOf: (category) => category.name,
                         selectedIds: _categoryIds,
                         onChanged: (ids) => setState(() => _categoryIds = ids),
+                      ),
+                      AppInput(
+                        label: "Notas",
+                        hint: "Observações sobre a visita (opcional)",
+                        controller: _notesCtr,
+                        minLines: _notesMinLines,
+                        maxLines: _notesMaxLines,
+                        keyboardType: TextInputType.multiline,
+                        textInputAction: TextInputAction.newline,
+                        textCapitalization: TextCapitalization.sentences,
                       ),
                       AppFilePickerField(
                         label: "Fotografias",

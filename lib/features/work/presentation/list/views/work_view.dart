@@ -59,6 +59,7 @@ class WorkView extends StatelessWidget {
             emptyTitle: 'Nenhuma obra encontrada',
             emptyMessage: 'As obras que criar aparecem aqui.',
             emptyIcon: Icons.construction_outlined,
+            isEmpty: state.works.isEmpty,
             onRetry: () => context.read<WorkBloc>().add(const WorkStarted()),
             skeleton: (context) => const WorkListSkeleton(),
             builder: (context) {

@@ -28,6 +28,10 @@ abstract class VisitModel with _$VisitModel {
     required int workId,
     required DateTime date,
 
+    /// Whatever the inspector wrote about the visit. Optional — null, never
+    /// an empty string, when nothing was written.
+    String? notes,
+
     /// Loaded with the visit by `fetchVisits`. Not columns of the `visits`
     /// row, so JSON leaves them out both ways and `toJson()` stays a row the
     /// database can take as-is.

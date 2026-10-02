@@ -53,7 +53,8 @@ class WorkState extends Equatable implements StatusState<WorkState> {
   /// is — the next page's key, and whether it is loading or failed.
   final PagedList<WorkModel> works;
 
-  /// A backup is being written — the Backup button shows a spinner.
+  /// A backup is being written or imported — the Backup button shows a
+  /// spinner.
   final bool isBackingUp;
 
   WorkState copyWith({

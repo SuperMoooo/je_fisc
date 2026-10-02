@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import '../../core/services/local_file_store.dart';
 import 'injector.dart';
 import '../../features/work/data/datasources/work_local_datasource.dart';
+import '../../features/work/data/datasources/work_report_datasource.dart';
 import '../../features/work/data/repositories/work_repository_impl.dart';
 import '../../features/work/domain/repositories/work_repository.dart';
 import '../../features/category/data/datasources/category_local_datasource.dart';
@@ -22,8 +23,12 @@ void registerDataLayer() {
   getIt.registerLazySingleton<WorkLocalDataSource>(
     () => WorkLocalDataSource(getIt<Database>(), getIt<LocalFileStore>()),
   );
+  getIt.registerLazySingleton<WorkReportDataSource>(WorkReportDataSource.new);
   getIt.registerLazySingleton<WorkRepository>(
-    () => WorkRepositoryImpl(getIt<WorkLocalDataSource>()),
+    () => WorkRepositoryImpl(
+      getIt<WorkLocalDataSource>(),
+      getIt<WorkReportDataSource>(),
+    ),
   );
 
   // ── Category ────────────────────────────────────────────────

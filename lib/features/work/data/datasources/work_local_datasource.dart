@@ -1,14 +1,17 @@
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
+import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
 import 'package:je_fisc/core/database/app_database.dart';
 import 'package:je_fisc/core/database/safe_db_call.dart';
+import 'package:je_fisc/core/errors/app_exception.dart';
 import 'package:je_fisc/core/network/paginated.dart';
 import 'package:je_fisc/core/services/local_file_store.dart';
 import 'package:je_fisc/core/utils/extensions.dart';
 import 'package:je_fisc/features/category/domain/models/category_model.dart';
+import 'package:je_fisc/features/work/domain/models/backup_import.dart';
 import 'package:je_fisc/features/work/domain/models/visit_model.dart';
 import 'package:je_fisc/features/work/domain/models/visit_picture_model.dart';
 import 'package:je_fisc/features/work/domain/models/work_model.dart';
@@ -295,6 +298,223 @@ class WorkLocalDataSource {
     );
     return saved != null;
   });
+
+  /// Asks the user for a backup [exportBackup] wrote and adds to this
+  /// database everything in it that is not here yet. Null when the dialog
+  /// was dismissed.
+  ///
+  /// Nothing already here is changed or removed, so it is safe on a device
+  /// with data of its own, and importing the same file twice adds nothing
+  /// the second time. What counts as already here:
+  ///
+  /// - a category with the same name, ignoring case;
+  /// - a work with the same client, address and start date;
+  /// - a visit of that work at the same date and time.
+  ///
+  /// A new visit comes with its categories, and with those of its pictures
+  /// whose files are on this device — see [BackupImport.missingPictures].
+  ///
+  /// The backup is opened from a copy, migrated to the current schema, so
+  /// one written by an older version of the app imports the same way.
+  Future<BackupImport?> importBackup() => safeDbCall(() async {
+    final picked = await FilePicker.pickFile(
+      dialogTitle: 'Escolher cópia de segurança',
+    );
+    if (picked == null) return null;
+    final source = picked.path;
+    if (source == null) {
+      throw const StorageException(
+        message: 'Não foi possível ler o ficheiro escolhido.',
+      );
+    }
+    return importBackupFrom(source);
+  });
+
+  /// [importBackup] for the file at [path], without the dialog.
+  Future<BackupImport> importBackupFrom(String path) => safeDbCall(() async {
+    if (!await _isBackup(path)) throw _notABackup;
+
+    // A copy, never the picked file: opening runs the migrations, and those
+    // write to the file they open.
+    final copy = p.join(await getDatabasesPath(), _importCopyName);
+    await deleteDatabase(copy);
+    await File(path).copy(copy);
+    try {
+      final backup = await AppDatabase.openAt(copy);
+      try {
+        return await _merge(backup);
+      } finally {
+        await backup.close();
+      }
+    } finally {
+      await deleteDatabase(copy);
+    }
+  });
+
+  static const _importCopyName = 'je_fisc_import.db';
+
+  static const _notABackup = StorageException(
+    message: 'O ficheiro escolhido não é uma cópia de segurança da aplicação.',
+  );
+
+  /// Whether [path] is an SQLite file with this app's tables — checked
+  /// before anything opens it for writing, which would add them to any
+  /// SQLite file it was handed.
+  Future<bool> _isBackup(String path) async {
+    const header = 'SQLite format 3\u0000';
+    final file = await File(path).open();
+    try {
+      final bytes = await file.read(header.length);
+      if (String.fromCharCodes(bytes) != header) return false;
+    } finally {
+      await file.close();
+    }
+    final db = await openReadOnlyDatabase(path, singleInstance: false);
+    try {
+      final tables = await db.query(
+        'sqlite_master',
+        where: "type = 'table' AND name IN (?, ?)",
+        whereArgs: [Tables.works, Tables.visits],
+      );
+      return tables.length == 2;
+    } finally {
+      await db.close();
+    }
+  }
+
+  /// Copies what [backup] has and this database lacks, in one transaction —
+  /// an import that fails half-way adds no rows.
+  ///
+  /// Ids are never copied: the backup's are only used to follow its rows to
+  /// one another, and each is mapped to the id the row has, or gets, here.
+  Future<BackupImport> _merge(Database backup) async {
+    final categoryRows = await backup.query(Tables.categories);
+    final workRows = await backup.query(Tables.works, orderBy: 'id');
+    final visitRows = await backup.query(Tables.visits, orderBy: 'id');
+    final pictureRows = await backup.query(Tables.visitPictures, orderBy: 'id');
+    final linkRows = await backup.query(Tables.visitCategories);
+
+    return _db.transaction((txn) async {
+      // Read before anything is inserted, so two rows of the backup that
+      // look alike are both imported rather than the second matching the
+      // first.
+      String workKey(Map<String, Object?> row) =>
+          '${row['client_name']}\u0000${row['address']}\u0000'
+          '${row['start_date']}';
+      final localWorks = {
+        for (final row in await txn.query(Tables.works))
+          workKey(row): row['id'],
+      };
+      final localVisits = {
+        for (final row in await txn.query(
+          Tables.visits,
+          columns: ['work_id', 'date'],
+        ))
+          '${row['work_id']}\u0000${row['date']}',
+      };
+      final localPictures = {
+        for (final row in await txn.query(
+          Tables.visitPictures,
+          columns: ['picture_path'],
+        ))
+          row['picture_path'],
+      };
+
+      // Backup id → id here.
+      final categoryIds = <Object?, int>{};
+      for (final row in categoryRows) {
+        final name = row['name']! as String;
+        await txn.insert(Tables.categories, {
+          'name': name,
+        }, conflictAlgorithm: ConflictAlgorithm.ignore);
+        // `name` is NOCASE, so this finds the row whatever its case.
+        final local = await txn.query(
+          Tables.categories,
+          columns: ['id'],
+          where: 'name = ?',
+          whereArgs: [name],
+          limit: 1,
+        );
+        categoryIds[row['id']] = local.first['id']! as int;
+      }
+
+      final workIds = <Object?, int>{};
+      var works = 0;
+      for (final row in workRows) {
+        final existing = localWorks[workKey(row)];
+        if (existing != null) {
+          workIds[row['id']] = existing as int;
+          continue;
+        }
+        final clientName = row['client_name']! as String;
+        final address = row['address']! as String;
+        workIds[row['id']] = await txn.insert(Tables.works, {
+          'client_name': clientName,
+          'address': address,
+          'start_date': row['start_date'],
+          'end_date': row['end_date'],
+          'search_key': SearchKeys.work(
+            clientName: clientName,
+            address: address,
+          ),
+        });
+        works++;
+      }
+
+      // Only the visits added here: one already here keeps its own
+      // categories and pictures.
+      final visitIds = <Object?, int>{};
+      for (final row in visitRows) {
+        final workId = workIds[row['work_id']];
+        if (workId == null) continue;
+        if (localVisits.contains('$workId\u0000${row['date']}')) continue;
+        visitIds[row['id']] = await txn.insert(Tables.visits, {
+          'work_id': workId,
+          'date': row['date'],
+          'notes': row['notes'],
+        });
+      }
+
+      final children = txn.batch();
+      for (final row in linkRows) {
+        final visitId = visitIds[row['visit_id']];
+        final categoryId = categoryIds[row['category_id']];
+        if (visitId == null || categoryId == null) continue;
+        children.insert(Tables.visitCategories, {
+          'visit_id': visitId,
+          'category_id': categoryId,
+        }, conflictAlgorithm: ConflictAlgorithm.ignore);
+      }
+      var missingPictures = 0;
+      for (final row in pictureRows) {
+        final visitId = visitIds[row['visit_id']];
+        if (visitId == null) continue;
+        var path = row['picture_path']! as String;
+        final file = await _files.resolve(path);
+        if (!await File(file).exists()) {
+          missingPictures++;
+          continue;
+        }
+        // A file a row here already points at gets a copy of its own:
+        // deleting either visit deletes its files, and must not take the
+        // other's with it.
+        if (localPictures.contains(path)) {
+          path = await _files.save(file, folder: _picturesFolder);
+        }
+        children.insert(Tables.visitPictures, {
+          'visit_id': visitId,
+          'picture_path': path,
+        });
+      }
+      await children.commit(noResult: true);
+
+      return (
+        works: works,
+        visits: visitIds.length,
+        missingPictures: missingPictures,
+      );
+    });
+  }
 
   // ── Helpers ──────────────────────────────────────────────────
 

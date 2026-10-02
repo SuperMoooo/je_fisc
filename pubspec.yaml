@@ -59,6 +59,7 @@ dependencies:
   path: ^1.9.0
   path_provider: ^2.1.5
   table_calendar: any
+  pdf: ^3.13.1
 
 dev_dependencies:
   flutter_test:
@@ -89,6 +90,12 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # The PDF report's fonts — the pdf package's built-in Helvetica cannot draw
+  # much beyond Latin-1, and a visit's notes can hold anything.
+  assets:
+    - assets/fonts/Roboto-Regular.ttf
+    - assets/fonts/Roboto-Bold.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:

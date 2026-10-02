@@ -1,14 +1,18 @@
+import '../../../../core/errors/app_exception.dart';
 import '../../../../core/network/paginated.dart';
+import '../../domain/models/backup_import.dart';
 import '../../domain/models/visit_model.dart';
 import '../../domain/models/visit_picture_model.dart';
 import '../../domain/models/work_model.dart';
 import '../../domain/repositories/work_repository.dart';
 import '../datasources/work_local_datasource.dart';
+import '../datasources/work_report_datasource.dart';
 
 class WorkRepositoryImpl implements WorkRepository {
-  const WorkRepositoryImpl(this._local);
+  const WorkRepositoryImpl(this._local, this._report);
 
   final WorkLocalDataSource _local;
+  final WorkReportDataSource _report;
 
   // ── Works ────────────────────────────────────────────────────
 
@@ -60,4 +64,19 @@ class WorkRepositoryImpl implements WorkRepository {
 
   @override
   Future<bool> exportBackup() => _local.exportBackup();
+
+  @override
+  Future<BackupImport?> importBackup() => _local.importBackup();
+
+  // ── Report ───────────────────────────────────────────────────
+
+  @override
+  Future<bool> exportVisitsReport(int workId) async {
+    final work = await _local.fetchWork(workId);
+    if (work == null) {
+      throw const NotFoundException(message: 'Esta obra já não existe.');
+    }
+    final visits = await _local.fetchVisits(workId);
+    return _report.exportVisits(work, visits);
+  }
 }
