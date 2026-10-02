@@ -116,73 +116,73 @@ class AppHeading extends StatelessWidget {
   static const double _iconScale = 1.15;
 
   _HeadingSizeConfig _sizeConfig() => switch (size) {
-        AppHeadingSize.display => (
-            fontSize: AppConstants.fontSize34,
-            subtitleSize: AppConstants.fontSize16,
-            weight: FontWeight.w700,
-            letterSpacing: -0.5,
-            uppercase: false,
-          ),
-        AppHeadingSize.large => (
-            fontSize: AppConstants.fontSize28,
-            subtitleSize: AppConstants.fontSize15,
-            weight: FontWeight.w700,
-            letterSpacing: -0.25,
-            uppercase: false,
-          ),
-        AppHeadingSize.medium => (
-            fontSize: AppConstants.fontSize22,
-            subtitleSize: AppConstants.fontSize14,
-            weight: FontWeight.w600,
-            letterSpacing: 0,
-            uppercase: false,
-          ),
-        AppHeadingSize.small => (
-            fontSize: AppConstants.fontSize17,
-            subtitleSize: AppConstants.fontSize13,
-            weight: FontWeight.w600,
-            letterSpacing: 0,
-            uppercase: false,
-          ),
-        AppHeadingSize.label => (
-            fontSize: AppConstants.fontSize13,
-            subtitleSize: AppConstants.fontSize12,
-            weight: FontWeight.w600,
-            letterSpacing: _capsLetterSpacing,
-            uppercase: true,
-          ),
-      };
+    AppHeadingSize.display => (
+      fontSize: AppConstants.fontSize34,
+      subtitleSize: AppConstants.fontSize16,
+      weight: FontWeight.w700,
+      letterSpacing: -0.5,
+      uppercase: false,
+    ),
+    AppHeadingSize.large => (
+      fontSize: AppConstants.fontSize28,
+      subtitleSize: AppConstants.fontSize15,
+      weight: FontWeight.w700,
+      letterSpacing: -0.25,
+      uppercase: false,
+    ),
+    AppHeadingSize.medium => (
+      fontSize: AppConstants.fontSize22,
+      subtitleSize: AppConstants.fontSize14,
+      weight: FontWeight.w600,
+      letterSpacing: 0,
+      uppercase: false,
+    ),
+    AppHeadingSize.small => (
+      fontSize: AppConstants.fontSize17,
+      subtitleSize: AppConstants.fontSize13,
+      weight: FontWeight.w600,
+      letterSpacing: 0,
+      uppercase: false,
+    ),
+    AppHeadingSize.label => (
+      fontSize: AppConstants.fontSize13,
+      subtitleSize: AppConstants.fontSize12,
+      weight: FontWeight.w600,
+      letterSpacing: _capsLetterSpacing,
+      uppercase: true,
+    ),
+  };
 
   /// The theme role each size starts from, so the app's font family and any
   /// theme-level tweaks flow through before the size metrics land on top.
   TextStyle? _baseStyle(TextTheme textTheme) => switch (size) {
-        AppHeadingSize.display => textTheme.headlineLarge,
-        AppHeadingSize.large => textTheme.headlineMedium,
-        AppHeadingSize.medium => textTheme.titleLarge,
-        AppHeadingSize.small => textTheme.titleMedium,
-        AppHeadingSize.label => textTheme.labelSmall,
-      };
+    AppHeadingSize.display => textTheme.headlineLarge,
+    AppHeadingSize.large => textTheme.headlineMedium,
+    AppHeadingSize.medium => textTheme.titleLarge,
+    AppHeadingSize.small => textTheme.titleMedium,
+    AppHeadingSize.label => textTheme.labelSmall,
+  };
 
   Color _variantColor(ThemeData theme) => switch (variant) {
-        AppHeadingVariant.primary => theme.colorScheme.primary,
-        AppHeadingVariant.secondary => theme.colorScheme.secondary,
-        AppHeadingVariant.tertiary => theme.colorScheme.tertiary,
-        AppHeadingVariant.danger => theme.colorScheme.error,
-        AppHeadingVariant.neutral => theme.colorScheme.onSurface,
-        AppHeadingVariant.muted => theme.colorScheme.onSurfaceVariant,
-      };
+    AppHeadingVariant.primary => theme.colorScheme.primary,
+    AppHeadingVariant.secondary => theme.colorScheme.secondary,
+    AppHeadingVariant.tertiary => theme.colorScheme.tertiary,
+    AppHeadingVariant.danger => theme.colorScheme.error,
+    AppHeadingVariant.neutral => theme.colorScheme.onSurface,
+    AppHeadingVariant.muted => theme.colorScheme.onSurfaceVariant,
+  };
 
   TextAlign get _textAlign => switch (align) {
-        AppHeadingAlign.start => TextAlign.start,
-        AppHeadingAlign.center => TextAlign.center,
-        AppHeadingAlign.end => TextAlign.end,
-      };
+    AppHeadingAlign.start => TextAlign.start,
+    AppHeadingAlign.center => TextAlign.center,
+    AppHeadingAlign.end => TextAlign.end,
+  };
 
   CrossAxisAlignment get _crossAlign => switch (align) {
-        AppHeadingAlign.start => CrossAxisAlignment.start,
-        AppHeadingAlign.center => CrossAxisAlignment.center,
-        AppHeadingAlign.end => CrossAxisAlignment.end,
-      };
+    AppHeadingAlign.start => CrossAxisAlignment.start,
+    AppHeadingAlign.center => CrossAxisAlignment.center,
+    AppHeadingAlign.end => CrossAxisAlignment.end,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -191,15 +191,15 @@ class AppHeading extends StatelessWidget {
     final accent = color ?? _variantColor(theme);
     final caps = uppercase ?? config.uppercase;
 
-    final titleStyle =
-        (_baseStyle(theme.textTheme) ?? const TextStyle()).copyWith(
-      color: accent,
-      fontSize: config.fontSize,
-      fontWeight: weight ?? config.weight,
-      letterSpacing: caps && config.letterSpacing < _capsLetterSpacing
-          ? _capsLetterSpacing
-          : config.letterSpacing,
-    );
+    final titleStyle = (_baseStyle(theme.textTheme) ?? const TextStyle())
+        .copyWith(
+          color: accent,
+          fontSize: config.fontSize,
+          fontWeight: weight ?? config.weight,
+          letterSpacing: caps && config.letterSpacing < _capsLetterSpacing
+              ? _capsLetterSpacing
+              : config.letterSpacing,
+        );
 
     Widget titleLine = Text(
       caps ? title.toUpperCase() : title,

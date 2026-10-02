@@ -1,3 +1,4 @@
+import '../../../../core/network/paginated.dart';
 import '../models/visit_model.dart';
 import '../models/visit_picture_model.dart';
 import '../models/work_model.dart';
@@ -7,15 +8,11 @@ abstract interface class WorkRepository {
   // [fetchVisits].
   Future<List<WorkModel>> fetchWorks();
 
-  /// One [page] (1-based) of [limit] works matching [query] — every word of
-  /// it, in the client name or the address, ignoring case and accents —
-  /// newest first. An empty [query] pages through every work. Fewer than
-  /// [limit] back means there are no more.
-  Future<List<WorkModel>> searchWorks({
-    String query = '',
-    required int page,
-    required int limit,
-  });
+  /// The page of works after the one keyed [next] (null: the first page)
+  /// matching [query] — every word of it, in the client name or the address,
+  /// ignoring case and accents — newest first. An empty [query] pages through
+  /// every work. Pass the returned `next` back as is to get the page after.
+  Future<Paginated<WorkModel>> searchWorks({String query = '', Object? next});
 
   Future<WorkModel?> fetchWork({required int id});
   Future<WorkModel> createWork({required WorkModel work});

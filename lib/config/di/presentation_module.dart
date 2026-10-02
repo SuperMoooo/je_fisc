@@ -2,7 +2,14 @@ import '../../features/work/domain/repositories/work_repository.dart';
 import '../../features/work/presentation/create/blocs/work_create_bloc.dart';
 import '../../features/work/presentation/detail/blocs/work_detail_bloc.dart';
 import '../../features/work/presentation/list/blocs/work_bloc.dart';
+import '../../features/work/presentation/visit_create/blocs/visit_create_bloc.dart';
 import 'injector.dart';
+import '../../features/category/domain/repositories/category_repository.dart';
+import '../../features/category/presentation/blocs/category_bloc.dart';
+import '../../features/calendar/domain/repositories/calendar_repository.dart';
+import '../../features/calendar/presentation/blocs/calendar_bloc.dart';
+import '../../core/security/biometric_service.dart';
+import '../../features/navigation/presentation/blocs/navigation_bloc.dart';
 
 /// The state holders.
 ///
@@ -28,6 +35,34 @@ void registerBlocs() {
   // closing the route closes it.
   getIt.registerFactory<WorkCreateBloc>(
     () => WorkCreateBloc(getIt<WorkRepository>()),
+  );
+
+  // ── VisitCreate ─────────────────────────────────────────────
+  // A factory, not a singleton: the screen's BlocProvider creates it and
+  // closing the route closes it.
+  getIt.registerFactory<VisitCreateBloc>(
+    () => VisitCreateBloc(getIt<WorkRepository>(), getIt<CategoryRepository>()),
+  );
+
+  // ── Category ────────────────────────────────────────────────
+  // A factory, not a singleton: the screen's BlocProvider creates it and
+  // closing the route closes it.
+  getIt.registerFactory<CategoryBloc>(
+    () => CategoryBloc(getIt<CategoryRepository>()),
+  );
+
+  // ── Calendar ────────────────────────────────────────────────
+  // A factory, not a singleton: the screen's BlocProvider creates it and
+  // closing the route closes it.
+  getIt.registerFactory<CalendarBloc>(
+    () => CalendarBloc(getIt<CalendarRepository>()),
+  );
+
+  // ── Navigation ──────────────────────────────────────────────
+  // A factory like the rest. The shell's BlocProvider is the one owner, and
+  // the shell is on screen for the life of the app.
+  getIt.registerFactory<NavigationBloc>(
+    () => NavigationBloc(getIt<BiometricService>()),
   );
 
   // moarch:registrations — `moarch create feature` and

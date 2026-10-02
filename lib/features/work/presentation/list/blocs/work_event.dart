@@ -1,8 +1,4 @@
-import 'dart:async';
-
 import 'package:equatable/equatable.dart';
-
-import '../../../domain/models/work_model.dart';
 
 /// Everything that can happen to Work, as values. Sealed, so the `on<...>`
 /// registrations are checked for completeness when a new one is added.
@@ -13,9 +9,17 @@ sealed class WorkEvent extends Equatable {
   List<Object?> get props => const [];
 }
 
-/// Loads the screen. Dispatched when it opens, and again to refresh or retry.
+/// Loads the screen's first page of works. Dispatched when it opens, and
+/// again to retry. The biometric check is the navigation shell's, before
+/// this screen is ever built.
 final class WorkStarted extends WorkEvent {
   const WorkStarted();
+}
+
+/// Pull-to-refresh: reloads the current search from its first page, over the
+/// works already on screen.
+final class WorkRefreshed extends WorkEvent {
+  const WorkRefreshed();
 }
 
 /// The search field changed. The bloc waits for typing to pause before it
@@ -29,33 +33,9 @@ final class WorkSearchChanged extends WorkEvent {
   List<Object?> get props => [query];
 }
 
-/// The list needs another page — sent by `WorkList`'s fetcher, which awaits
-/// [result].
-///
-/// `MoInfiniteScroll` keeps the pages and asks for them with a function that
-/// returns a Future; this event is how that function reaches the repository
-/// without the view touching it. The bloc answers with the repository's
-/// Future as-is, so a failure reaches the list as the error it shows with its
-/// retry button.
-final class WorkPageRequested extends WorkEvent {
-  WorkPageRequested({
-    required this.query,
-    required this.page,
-    required this.limit,
-  });
-
-  final String query;
-  final int page;
-  final int limit;
-
-  final _completer = Completer<List<WorkModel>>();
-
-  /// Completes with the page, or with the error loading it.
-  Future<List<WorkModel>> get result => _completer.future;
-
-  /// Called once, by the bloc.
-  void respond(Future<List<WorkModel>> works) => _completer.complete(works);
-
-  @override
-  List<Object?> get props => [query, page, limit];
+/// The list neared its end and wants the next page — also the retry after a
+/// page failed. Sent freely: `PagedBlocMixin.loadMore` ignores it while a
+/// page is loading or after the last one.
+final class WorkMoreRequested extends WorkEvent {
+  const WorkMoreRequested();
 }

@@ -39,8 +39,9 @@ class AppListTile extends StatelessWidget {
     // `listTileTheme` itself — otherwise a project sets its row inset there and
     // watches nothing move.
     final tileTheme = theme.listTileTheme;
-    final titleColor =
-        danger ? theme.colorScheme.error : theme.colorScheme.onSurface;
+    final titleColor = danger
+        ? theme.colorScheme.error
+        : theme.colorScheme.onSurface;
 
     Widget? resolvedTrailing = trailing;
     if (resolvedTrailing == null && showChevron) {

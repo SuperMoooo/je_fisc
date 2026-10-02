@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:je_fisc/features/category/domain/models/category_model.dart';
 import 'package:je_fisc/features/work/domain/models/visit_model.dart';
 import 'package:je_fisc/features/work/domain/models/work_model.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -45,7 +46,10 @@ class WorkDetailState extends Equatable
           id: i,
           workId: 0,
           date: DateTime(2000),
-          categories: [BoneMock.words(1), BoneMock.words(2)],
+          categories: [
+            CategoryModel(id: 0, name: BoneMock.words(1)),
+            CategoryModel(id: 1, name: BoneMock.words(2)),
+          ],
         ),
     ],
   );

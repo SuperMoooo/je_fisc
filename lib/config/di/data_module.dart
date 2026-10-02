@@ -5,6 +5,12 @@ import 'injector.dart';
 import '../../features/work/data/datasources/work_local_datasource.dart';
 import '../../features/work/data/repositories/work_repository_impl.dart';
 import '../../features/work/domain/repositories/work_repository.dart';
+import '../../features/category/data/datasources/category_local_datasource.dart';
+import '../../features/category/data/repositories/category_repository_impl.dart';
+import '../../features/category/domain/repositories/category_repository.dart';
+import '../../features/calendar/data/datasources/calendar_local_datasource.dart';
+import '../../features/calendar/data/repositories/calendar_repository_impl.dart';
+import '../../features/calendar/domain/repositories/calendar_repository.dart';
 
 /// The data layer: each feature's datasources, and the repository
 /// implementation bound to the interface its domain layer declares.
@@ -18,6 +24,22 @@ void registerDataLayer() {
   );
   getIt.registerLazySingleton<WorkRepository>(
     () => WorkRepositoryImpl(getIt<WorkLocalDataSource>()),
+  );
+
+  // ── Category ────────────────────────────────────────────────
+  getIt.registerLazySingleton<CategoryLocalDataSource>(
+    () => CategoryLocalDataSource(getIt<Database>()),
+  );
+  getIt.registerLazySingleton<CategoryRepository>(
+    () => CategoryRepositoryImpl(getIt<CategoryLocalDataSource>()),
+  );
+
+  // ── Calendar ────────────────────────────────────────────────
+  getIt.registerLazySingleton<CalendarLocalDataSource>(
+    () => CalendarLocalDataSource(getIt<Database>()),
+  );
+  getIt.registerLazySingleton<CalendarRepository>(
+    () => CalendarRepositoryImpl(getIt<CalendarLocalDataSource>()),
   );
 
   // moarch:registrations — `moarch create feature` inserts each new

@@ -1,3 +1,4 @@
+import '../../../../core/network/paginated.dart';
 import '../../domain/models/visit_model.dart';
 import '../../domain/models/visit_picture_model.dart';
 import '../../domain/models/work_model.dart';
@@ -15,11 +16,8 @@ class WorkRepositoryImpl implements WorkRepository {
   Future<List<WorkModel>> fetchWorks() => _local.fetchWorks();
 
   @override
-  Future<List<WorkModel>> searchWorks({
-    String query = '',
-    required int page,
-    required int limit,
-  }) => _local.searchWorks(query: query, page: page, limit: limit);
+  Future<Paginated<WorkModel>> searchWorks({String query = '', Object? next}) =>
+      _local.searchWorks(query: query, next: next);
 
   @override
   Future<WorkModel?> fetchWork({required int id}) => _local.fetchWork(id);

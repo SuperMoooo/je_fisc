@@ -10,14 +10,24 @@ abstract final class AppRoutes {
   // `moarch create feature` adds each feature's path above the next line —
   // keep it.
   // Full locations — navigate with these.
+  //
+  // The tabs, each a branch of the StatefulShellRoute in app_router.dart.
   static const work = '/work';
-  static const createWork = '$work/$createWorkSegment';
-  static String workDetailOf(int id) => '$work/$id';
+  static const calendar = '/calendar';
+  static const category = '/category';
 
-  // Child segments of [work] — GoRouter joins a nested route's path onto its
-  // parent's, so the sub-routes in app_router.dart use these, not full paths.
-  static const createWorkSegment = 'create';
-  static const workDetailsSegment = ':workId';
+  // Full-screen routes over the tabs. Top level rather than nested under
+  // [work], so they cover the bottom bar and can be pushed from any tab
+  // without switching to Obras underneath.
+  static const createWork = '/work/create';
+  static const workDetail = '/work/:workId';
+  static String workDetailOf(int id) => '/work/$id';
+  static String createVisitOf(int workId) =>
+      '${workDetailOf(workId)}/$createVisitSegment';
+
+  // Child segment of [workDetail] — GoRouter joins a nested route's path
+  // onto its parent's.
+  static const createVisitSegment = 'visits/create';
   // moarch:routes
 
   // Dynamic routes: the constant holds the pattern GoRouter matches on, the

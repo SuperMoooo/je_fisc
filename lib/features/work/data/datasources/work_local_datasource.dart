@@ -2,8 +2,10 @@ import 'package:sqflite/sqflite.dart';
 
 import 'package:je_fisc/core/database/app_database.dart';
 import 'package:je_fisc/core/database/safe_db_call.dart';
+import 'package:je_fisc/core/network/paginated.dart';
 import 'package:je_fisc/core/services/local_file_store.dart';
 import 'package:je_fisc/core/utils/extensions.dart';
+import 'package:je_fisc/features/category/domain/models/category_model.dart';
 import 'package:je_fisc/features/work/domain/models/visit_model.dart';
 import 'package:je_fisc/features/work/domain/models/visit_picture_model.dart';
 import 'package:je_fisc/features/work/domain/models/work_model.dart';
@@ -28,6 +30,9 @@ class WorkLocalDataSource {
   static const _picturesFolder = 'visit_pictures';
   static final _whitespace = RegExp(r'\s+');
 
+  /// How many works [searchWorks] returns per page.
+  static const _pageSize = 20;
+
   /// A work's row: its JSON plus the `search_key` [searchWorks] matches.
   static Map<String, dynamic> _workRow(WorkModel work) => {
     ...work.toJson(),
@@ -48,17 +53,22 @@ class WorkLocalDataSource {
     return rows.map(WorkModel.fromJson).toList();
   });
 
-  /// One [page] (1-based) of [limit] works whose client name or address
-  /// contains every word of [query], newest first. An empty [query] pages
-  /// through every work.
+  /// The page of [limit] works after the one keyed [next] whose client name
+  /// or address contains every word of [query], newest first. An empty
+  /// [query] pages through every work.
+  ///
+  /// [next] is a 1-based page number — null for the first page — and only
+  /// this method reads it. One row more than [limit] is asked for, so the
+  /// last page is known without a trailing empty request.
   ///
   /// Matched against `search_key` ([SearchKeys.work]), so case and accents
   /// are ignored on both sides.
-  Future<List<WorkModel>> searchWorks({
+  Future<Paginated<WorkModel>> searchWorks({
     String query = '',
-    required int page,
-    required int limit,
+    Object? next,
+    int limit = _pageSize,
   }) => safeDbCall(() async {
+    final page = next as int? ?? 1;
     final words = query.searchKey
         .split(_whitespace)
         .where((word) => word.isNotEmpty)
@@ -77,10 +87,14 @@ class WorkLocalDataSource {
       // `id` breaks ties, so a page boundary between two works with the same
       // start date cannot show one twice and skip the other.
       orderBy: 'start_date DESC, id DESC',
-      limit: limit,
+      limit: limit + 1,
       offset: (page - 1) * limit,
     );
-    return rows.map(WorkModel.fromJson).toList();
+    final hasMore = rows.length > limit;
+    return Paginated(
+      items: rows.take(limit).map(WorkModel.fromJson).toList(),
+      next: hasMore ? page + 1 : null,
+    );
   });
 
   Future<WorkModel?> fetchWork(int id) => safeDbCall(() async {
@@ -134,7 +148,9 @@ class WorkLocalDataSource {
           Tables.visits,
           where: 'work_id = ?',
           whereArgs: [workId],
-          orderBy: 'date DESC',
+          // `id` breaks ties: visits on the same day (the form defaults to
+          // today) come most recently created first.
+          orderBy: 'date DESC, id DESC',
         ),
         await txn.query(
           Tables.visitPictures,
@@ -142,11 +158,14 @@ class WorkLocalDataSource {
           whereArgs: [workId],
           orderBy: 'id',
         ),
-        await txn.query(
-          Tables.visitCategories,
-          where: ofWork,
-          whereArgs: [workId],
-          orderBy: 'category',
+        // Joined to the lookup table for the name, alphabetically.
+        await txn.rawQuery(
+          'SELECT vc.visit_id, c.id, c.name '
+          'FROM ${Tables.visitCategories} vc '
+          'JOIN ${Tables.categories} c ON c.id = vc.category_id '
+          'WHERE vc.$ofWork '
+          'ORDER BY c.name',
+          [workId],
         ),
       ),
     );
@@ -156,10 +175,10 @@ class WorkLocalDataSource {
       final picture = await _pictureFromRow(row);
       (pictures[picture.visitId] ??= []).add(picture);
     }
-    final categories = <int, List<String>>{};
+    final categories = <int, List<CategoryModel>>{};
     for (final row in categoryRows) {
       (categories[row['visit_id']! as int] ??= []).add(
-        row['category']! as String,
+        CategoryModel.fromJson(row),
       );
     }
 
@@ -181,7 +200,7 @@ class WorkLocalDataSource {
       await _insertCategories(txn, id, visit.categories);
       return visit.copyWith(
         id: id,
-        categories: visit.categories.toSet().toList(),
+        categories: {for (final c in visit.categories) c.id: c}.values.toList(),
       );
     });
   });
@@ -269,18 +288,18 @@ class WorkLocalDataSource {
   Future<void> _update(String table, int id, Map<String, dynamic> row) =>
       _db.update(table, row, where: 'id = ?', whereArgs: [id]);
 
-  /// Duplicates in [categories] are dropped rather than tripping the
-  /// UNIQUE (visit_id, category) constraint.
+  /// Links the visit to each of [categories] by id. Duplicates are dropped
+  /// rather than tripping the UNIQUE (visit_id, category_id) constraint.
   Future<void> _insertCategories(
     DatabaseExecutor db,
     int visitId,
-    List<String> categories,
+    List<CategoryModel> categories,
   ) async {
     final batch = db.batch();
-    for (final category in categories.toSet()) {
+    for (final id in {for (final c in categories) c.id}) {
       batch.insert(Tables.visitCategories, {
         'visit_id': visitId,
-        'category': category,
+        'category_id': id,
       });
     }
     await batch.commit(noResult: true);

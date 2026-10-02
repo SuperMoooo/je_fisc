@@ -77,6 +77,83 @@ abstract final class AppDatabase {
       // The UNIQUE constraint above already indexes visit_id first, so
       // lookups by visit need no index of their own.
     },
+
+    // v2 — categories become a lookup table the user can add to, and a
+    // visit's categories point at it by id instead of holding free text.
+    (txn) async {
+      // NOCASE: "Jardim" and "jardim" are one category, both for the UNIQUE
+      // constraint and for the alphabetical order the list is read in.
+      await txn.execute('''
+        CREATE TABLE ${Tables.categories} (
+          id   INTEGER PRIMARY KEY AUTOINCREMENT,
+          name TEXT    NOT NULL UNIQUE COLLATE NOCASE
+        )
+      ''');
+      final seed = txn.batch();
+      for (final name in _initialCategories) {
+        seed.insert(Tables.categories, {'name': name});
+      }
+      await seed.commit(noResult: true);
+
+      // Free-text categories saved under v1 join the table rather than being
+      // lost; OR IGNORE skips the ones the seed already holds.
+      await txn.execute('''
+        INSERT OR IGNORE INTO ${Tables.categories} (name)
+        SELECT DISTINCT category FROM ${Tables.visitCategories}
+      ''');
+
+      // SQLite cannot change a column's type or add a foreign key in place,
+      // so the table is rebuilt and the old rows copied across by name.
+      // RESTRICT: a category some visit uses cannot be deleted from under it.
+      await txn.execute('''
+        CREATE TABLE visit_categories_v2 (
+          id          INTEGER PRIMARY KEY AUTOINCREMENT,
+          visit_id    INTEGER NOT NULL
+                      REFERENCES ${Tables.visits}(id) ON DELETE CASCADE,
+          category_id INTEGER NOT NULL
+                      REFERENCES ${Tables.categories}(id) ON DELETE RESTRICT,
+          UNIQUE (visit_id, category_id)
+        )
+      ''');
+      await txn.execute('''
+        INSERT OR IGNORE INTO visit_categories_v2 (visit_id, category_id)
+        SELECT vc.visit_id, c.id
+        FROM ${Tables.visitCategories} vc
+        JOIN ${Tables.categories} c ON c.name = vc.category
+      ''');
+      await txn.execute('DROP TABLE ${Tables.visitCategories}');
+      await txn.execute(
+        'ALTER TABLE visit_categories_v2 RENAME TO ${Tables.visitCategories}',
+      );
+      await txn.execute(
+        'CREATE INDEX idx_visit_categories_category_id '
+        'ON ${Tables.visitCategories}(category_id)',
+      );
+    },
+  ];
+
+  /// What the categories table starts with. Seeded once, by the v2
+  /// migration — editing this list later changes nothing on an installed
+  /// app; add a migration for that.
+  static const _initialCategories = [
+    'Trabalhos preparatórios',
+    'Movimento de terras / Escavação',
+    'Fundações',
+    'Revestimento de pavimentos',
+    'Alvenarias',
+    'Rebocos',
+    'Impermeabilizações',
+    'Revestimento de paredes',
+    'Revestimento de tetos',
+    'Rede elétrica',
+    'Rede de águas',
+    'Rede de esgotos pluviais e domésticos',
+    'Ventilação',
+    'Carpintarias',
+    'Jardim',
+    'Serralharias',
+    'Domótica',
+    'Outros',
   ];
 
   static int get _version => _migrations.length;
@@ -107,6 +184,7 @@ abstract final class Tables {
   static const visits = 'visits';
   static const visitPictures = 'visit_pictures';
   static const visitCategories = 'visit_categories';
+  static const categories = 'categories';
 }
 
 /// The text a search matches against, stored beside the row it describes.

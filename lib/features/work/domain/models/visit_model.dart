@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
+import 'package:je_fisc/features/category/domain/models/category_model.dart';
+
 import 'visit_picture_model.dart';
 
 part 'visit_model.freezed.dart';
@@ -34,7 +36,7 @@ abstract class VisitModel with _$VisitModel {
     List<VisitPictureModel> pictures,
     @Default([])
     @JsonKey(includeFromJson: false, includeToJson: false)
-    List<String> categories,
+    List<CategoryModel> categories,
   }) = _VisitModel;
 
   factory VisitModel.fromJson(Map<String, dynamic> json) =>

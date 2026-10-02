@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 import 'config/di/injector.dart';
 import 'config/router/app_router.dart';
@@ -47,6 +48,9 @@ Future<void> main() async {
   // Registers every repository, datasource, service and bloc. Firebase is up
   // by this point, so the locator can hand out its instances.
   await setupInjector();
+
+  // The calendar's month and weekday names, in Portuguese.
+  await initializeDateFormatting('pt_PT');
 
   runApp(
     const MoAdapt(

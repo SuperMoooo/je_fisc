@@ -77,27 +77,27 @@ class AppCard extends StatelessWidget {
 
     final decoration = switch (type) {
       AppCardType.elevated => BoxDecoration(
-          color: surface,
-          borderRadius: radius,
-          border: border,
-          boxShadow: [
-            BoxShadow(
-              color: shadow.withValues(alpha: 0.08),
-              blurRadius: 16,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
+        color: surface,
+        borderRadius: radius,
+        border: border,
+        boxShadow: [
+          BoxShadow(
+            color: shadow.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
       AppCardType.filled => BoxDecoration(
-          color: surface,
-          borderRadius: radius,
-          border: border,
-        ),
+        color: surface,
+        borderRadius: radius,
+        border: border,
+      ),
       AppCardType.outlined => BoxDecoration(
-          color: Colors.transparent,
-          borderRadius: radius,
-          border: border,
-        ),
+        color: Colors.transparent,
+        borderRadius: radius,
+        border: border,
+      ),
     };
 
     final content = Container(

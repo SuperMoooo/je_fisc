@@ -98,7 +98,8 @@ class AppSingleScrollView extends StatelessWidget {
       controller: controller,
       reverse: reverse,
       keyboardDismissBehavior: keyboardDismissBehavior,
-      physics: physics ??
+      physics:
+          physics ??
           (alwaysScrollable ? const AlwaysScrollableScrollPhysics() : null),
       child: content,
     );
@@ -120,8 +121,10 @@ class AppSingleScrollView extends StatelessWidget {
           // Nested inside another scrollable there is no viewport height to
           // fill, so the child just takes the height it asks for.
           final available = constraints.hasBoundedHeight
-              ? (constraints.maxHeight - resolvedPadding.vertical)
-                  .clamp(0.0, double.infinity)
+              ? (constraints.maxHeight - resolvedPadding.vertical).clamp(
+                  0.0,
+                  double.infinity,
+                )
               : 0.0;
 
           return _scrollView(

@@ -109,10 +109,12 @@ class _AppDateInputState extends State<AppDateInput> {
 
   /// One range for both pickers, so the two platforms never disagree about
   /// which dates are selectable.
-  static final DateTime _firstDate =
-      DateTime.now().subtract(const Duration(days: 365 * 100));
-  static final DateTime _lastDate =
-      DateTime.now().add(const Duration(days: 365 * 100));
+  static final DateTime _firstDate = DateTime.now().subtract(
+    const Duration(days: 365 * 100),
+  );
+  static final DateTime _lastDate = DateTime.now().add(
+    const Duration(days: 365 * 100),
+  );
 
   @override
   void initState() {

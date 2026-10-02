@@ -1,22 +1,25 @@
 import 'package:bloc/bloc.dart';
 import 'package:bloc_concurrency/bloc_concurrency.dart';
-import 'package:flutter/foundation.dart';
-import 'package:je_fisc/config/di/injector.dart';
-import 'package:je_fisc/core/security/biometric_service.dart';
 
+import '../../../../../core/network/paginated.dart';
 import '../../../../../core/utils/app_status.dart';
+import '../../../../../core/utils/paged_list.dart';
+import '../../../domain/models/work_model.dart';
 import '../../../domain/repositories/work_repository.dart';
 import 'work_event.dart';
 import 'work_state.dart';
 
 class WorkBloc extends Bloc<WorkEvent, WorkState>
-    with ActionBlocMixin<WorkEvent, WorkState> {
+    with
+        ActionBlocMixin<WorkEvent, WorkState>,
+        PagedBlocMixin<WorkEvent, WorkState, WorkModel> {
   WorkBloc(this._repo) : super(const WorkState()) {
     on<WorkStarted>(_onStarted);
+    on<WorkRefreshed>(_onRefreshed);
     // restartable: a keystroke cancels the wait started by the one before,
     // so only the last one, once typing pauses, becomes the query.
     on<WorkSearchChanged>(_onSearchChanged, transformer: restartable());
-    on<WorkPageRequested>(_onPageRequested);
+    on<WorkMoreRequested>((event, emit) => loadMore(emit));
   }
 
   final WorkRepository _repo;
@@ -26,37 +29,42 @@ class WorkBloc extends Bloc<WorkEvent, WorkState>
 
   Future<void> _onStarted(WorkStarted event, Emitter<WorkState> emit) =>
       runAction(emit, (current) async {
-        final authenticated = await getIt<BiometricService>()
-            .verifyUserLocalAuth();
-        if (!authenticated && !kDebugMode) {
-          return current.copyWith(
-            status: AppStatus.failure,
-            errorMessage: "Não autenticado",
-          );
-        }
-        return current.copyWith(status: AppStatus.success);
+        final first = await _repo.searchWorks(query: current.query);
+        return current.copyWith(
+          status: AppStatus.success,
+          works: PagedList.first(first),
+        );
       });
 
+  /// The works on screen stay until the new first page lands; a failure is a
+  /// toast over them (runAction, from a loaded screen).
+  Future<void> _onRefreshed(WorkRefreshed event, Emitter<WorkState> emit) =>
+      runAction(emit, (current) async {
+        final first = await _repo.searchWorks(query: current.query);
+        return current.copyWith(works: PagedList.first(first));
+      });
+
+  /// A new search replaces the list with its first page. A page of the old
+  /// search still loading is then dropped by [loadMore], since the list it
+  /// belonged to is gone.
   Future<void> _onSearchChanged(
     WorkSearchChanged event,
     Emitter<WorkState> emit,
   ) => runAction(emit, (current) async {
     await Future<void>.delayed(_searchDebounce);
-    return current.copyWith(query: event.query.trim());
+    final query = event.query.trim();
+    final first = await _repo.searchWorks(query: query);
+    return current.copyWith(query: query, works: PagedList.first(first));
   });
 
-  /// Not through runAction, on purpose: this handler emits nothing. It hands
-  /// the repository's Future to the list, whose own loading row, error row
-  /// and retry button show it. runAction would add a second error display,
-  /// and would re-emit the state it started from — undoing a search typed
-  /// while the page was loading.
-  void _onPageRequested(WorkPageRequested event, Emitter<WorkState> emit) {
-    event.respond(
-      _repo.searchWorks(
-        query: event.query,
-        page: event.page,
-        limit: event.limit,
-      ),
-    );
-  }
+  @override
+  Future<Paginated<WorkModel>> fetchPage(Object? next) =>
+      _repo.searchWorks(query: state.query, next: next);
+
+  @override
+  PagedList<WorkModel> pagedOf(WorkState state) => state.works;
+
+  @override
+  WorkState withPaged(WorkState state, PagedList<WorkModel> paged) =>
+      state.copyWith(works: paged);
 }
